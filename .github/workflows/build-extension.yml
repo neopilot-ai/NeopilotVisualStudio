@@ -1,0 +1,73 @@
+name: Build Extension
+
+on:
+  push:
+    branches: [ "main" ]
+    tags:
+      - enterprise-release-v*
+  pull_request:
+    branches: [ "main" ]
+
+jobs:
+  build:
+    permissions:
+     contents: 'read'
+     id-token: 'write'
+    runs-on: windows-latest
+    if: |
+      (github.event_name == 'push' && github.ref_type == 'branch') ||
+      (github.event_name == 'push' && github.ref_type == 'tag' && startsWith(github.ref, 'refs/tags/enterprise-release-v'))
+    steps:
+    - name: Checkout
+      uses: actions/checkout@v3
+      with:
+        fetch-depth: 0
+
+    # Add  MSBuild to the PATH: https://github.com/microsoft/setup-msbuild
+    - name: Setup MSBuild
+      uses: microsoft/setup-msbuild@v1.0.2
+
+    - name: Setup NuGet
+      uses: NuGet/setup-nuget@v1.0.5
+
+    - name: Restore Packages
+      run: nuget restore NeopilotVS.sln
+
+    - name: Set Release Condition
+      id: check_release
+      run: |
+        $isRelease = "${{ github.event_name == 'push' && github.ref_type == 'tag' && startsWith(github.ref, 'refs/tags/enterprise-release-v') && (github.actor == 'edwardpark97' || github.actor == 'saranshsaini' || github.actor == 'fortenforge') }}"
+        echo "IS_RELEASE=$isRelease" | Out-File -FilePath $env:GITHUB_ENV -Append
+        if ($isRelease -eq 'true') {
+          $tag = "${{ github.ref_name }}"
+          $version = $tag -replace 'enterprise-release-v',''
+          echo "VSIX_VERSION=$version" | Out-File -FilePath $env:GITHUB_ENV -Append
+        }
+
+    - name: Update VSIX Version
+      if: env.IS_RELEASE == 'true'
+      run: |
+        $manifestPath = "NeopilotVS/source.extension.vsixmanifest"
+        $xml = [xml](Get-Content $manifestPath)
+        $xml.PackageManifest.Metadata.Identity.Version = "${{ env.VSIX_VERSION }}"
+        $xml.Save($manifestPath)
+
+    - name: Build Solution
+      run: msbuild NeopilotVS.sln /p:Configuration=Release /p:Platform="Any CPU" /p:TargetFrameworkVersion="v4.8" /restore
+
+    - id: auth
+      if: env.IS_RELEASE == 'true'
+      uses: google-github-actions/auth@v2
+      timeout-minutes: 1
+      with:
+        workload_identity_provider: ${{ secrets.GCP_WORKLOAD_IDENTITY_PROVIDER }}
+        service_account: ${{ secrets.GCP_SERVICE_ACCOUNT }}
+
+    - name: Upload Neopilot Visual Studio VSIX
+      if: env.IS_RELEASE == 'true'
+      uses: google-github-actions/upload-cloud-storage@v2
+      with:
+        path: NeopilotVS/bin/Release/Neopilot.vsix
+        process_gcloudignore: false
+        destination: neopilot-ai-dist/neopilot_visual_studio/${{ github.ref_name }}
+        gzip: false
