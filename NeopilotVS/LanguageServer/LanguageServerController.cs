@@ -15,6 +15,9 @@ public class LanguageServerController
     public WebSocket? ws = null;
     public LanguageServerController() { Package = NeopilotVSPackage.Instance; }
 
+    /// <summary>
+    /// Connects to the language server's chat web server via WebSocket.
+    /// </summary>
     public async Task ConnectAsync()
     {
 #pragma warning disable VSTHRD103 // Call async methods when in an async method
@@ -182,6 +185,12 @@ public class LanguageServerController
             .FireAndForget();
     }
 
+    /// <summary>
+    /// Sends a request to explain the specified code block.
+    /// </summary>
+    /// <param name="filePath">The path of the file containing the code.</param>
+    /// <param name="language">The language of the code.</param>
+    /// <param name="codeBlockInfo">Detailed information about the code block.</param>
     public async Task ExplainCodeBlockAsync(string filePath, Language language,
                                             CodeBlockInfo codeBlockInfo)
     {
@@ -273,6 +282,25 @@ public class LanguageServerController
                                                 file_path = filePath,
                                                 language = functionInfo.Language,
                                                 refactor_description = prompt } };
+        if (request.Send(ws))
+            await Package.ShowToolWindowAsync(
+                typeof(ChatToolWindow), 0, create: true, Package.DisposalToken);
+    }
+
+    /// <summary>
+    /// Sends a request to find similar code to the specified block in the workspace.
+    /// </summary>
+    /// <param name="filePath">The path of the file containing the code.</param>
+    /// <param name="language">The language of the code.</param>
+    /// <param name="codeBlockInfo">Detailed information about the code block.</param>
+    public async Task FindSimilarCodeAsync(string filePath, Language language, CodeBlockInfo codeBlockInfo)
+    {
+        var request = WebChatServer.NewRequest();
+        // We use a generic intent with a specific prompt for finding similar code
+        request.get_chat_message_request.chat_messages[0].intent = new() {
+            generic = new() { text = $"Find similar code to this block in my workspace: \n\n```{language.ToString().ToLower()}\n{codeBlockInfo.raw_source}\n```" }
+        };
+
         if (request.Send(ws))
             await Package.ShowToolWindowAsync(
                 typeof(ChatToolWindow), 0, create: true, Package.DisposalToken);

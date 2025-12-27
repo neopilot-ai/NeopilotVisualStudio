@@ -8,14 +8,14 @@ using System.Threading.Tasks;
 using System.Windows;
 using System.Windows.Controls;
 using System.Windows.Input;
+using System;
 
 namespace NeopilotVS;
 
 public partial class RefactorCodeDialogWindow : DialogWindow
 {
-    private class RefactorData
-    (string text, ImageMoniker image, string? prompt = null,
-     List<Packets.Language>? whiteListLanguages = null)
+    private class RefactorData(string text, ImageMoniker image, string? prompt = null,
+                               List<Packets.Language>? whiteListLanguages = null)
     {
         public string text = text;
         public string prompt = prompt ?? text;
@@ -23,22 +23,16 @@ public partial class RefactorCodeDialogWindow : DialogWindow
         public List<Packets.Language>? whiteListLanguages = whiteListLanguages;
     };
 
-    // Accessing elements via x:Name is clearer but since this is a partial class, we can just use the names directly if they are generated.
-    // However, to keep it consistent with the previous style or if x:Name linking is tricky without rebuilding:
-    private Border MainBorder => Content as Border;
-    private Grid MainGrid => MainBorder.Child as Grid;
-    private ScrollViewer ScrollViewer => MainGrid.Children[1] as ScrollViewer;
-    private StackPanel Panel => ScrollViewer.Content as StackPanel;
-
     private string? Result = null;
-
     private static RefactorCodeDialogWindow? Instance = null;
+
+    private void CloseButton_Click(object sender, RoutedEventArgs e) => CloseDialog();
+    private void SendButton_Click(object sender, RoutedEventArgs e) => ReturnResult(InputPrompt.Text);
 
     public RefactorCodeDialogWindow()
     {
         InitializeComponent();
-        InputPrompt.LostKeyboardFocus += (e, s) =>
-        { InputPrompt.Focus(); };
+        InputPrompt.LostKeyboardFocus += (s, e) => { InputPrompt.Focus(); };
     }
 
     public static RefactorCodeDialogWindow GetOrCreate()
@@ -68,105 +62,58 @@ public partial class RefactorCodeDialogWindow : DialogWindow
     {
         Result = null;
 
-        RefactorData[] CommandPresets = [
-            new RefactorData("Add comment and docstrings to the code", KnownMonikers.AddComment),
-            new RefactorData("Add logging statements so that it can be easily debugged",
-                             KnownMonikers.StartLogging),
-
-            new RefactorData("Generate Unit Tests",
-                             KnownMonikers.UnitTest,
-                             "Generate unit tests for this code using the most appropriate testing framework " + 
-                             "(e.g. xUnit, NUnit, pytest). Cover edge cases and happy paths."),
-
-            new RefactorData("Add type annotations to the code",
-                             KnownMonikers.NewType,
-                             "Add type annotations to this code block, including the function " +
-                                 "arguments and return type." +
-                                 " Modify the docstring to reflect the types.",
-                             [
-                                 Packets.Language.LANGUAGE_CSHARP,
-                                 Packets.Language.LANGUAGE_TYPESCRIPT,
-                                 Packets.Language.LANGUAGE_PYTHON
-                             ]),
-
-            new RefactorData("Clean up this code",
-                             KnownMonikers.CleanData,
-                             "Clean up this code by standardizing variable names, removing " +
-                                 "debugging statements, " +
-                                 "improving readability, and more. Explain what you did to clean " +
-                                 "it up in a short and concise way."),
-
-            new RefactorData(
-                "Check for bugs and null pointers",
-                KnownMonikers.Spy,
-                "Check for bugs such as null pointer references, unhandled exceptions, and more." +
-                    " If you don't see anything obvious, reply that things look good and that " +
-                    "the user" + " can reply with a stack trace to get more information."),
-
-            new RefactorData("Implement the code for the TODO comment",
-                             KnownMonikers.ImplementInterface),
-            new RefactorData("Fix mypy and pylint errors and warnings",
-                             KnownMonikers.DocumentWarning,
-                             null,
-                             [Packets.Language.LANGUAGE_PYTHON]),
-
-            new RefactorData(
-                "Make this code strongly typed",
-                KnownMonikers.TypePrivate,
-                "Make this code strongly typed, including the function arguments and return type." +
-                    " Modify the docstring to reflect the types."),
-
-            new RefactorData("Make this faster and more efficient", KnownMonikers.EventPublic),
-
-            new RefactorData("Make this code a functional React component",
-                             KnownMonikers.AddComponent,
-                             null,
-                             [Packets.Language.LANGUAGE_TYPESCRIPT, Packets.Language.LANGUAGE_TSX]),
-            new RefactorData("Create a Typescript interface to define the component props",
-                             KnownMonikers.ImplementInterface,
-                             null,
-                             [Packets.Language.LANGUAGE_TYPESCRIPT, Packets.Language.LANGUAGE_TSX]),
-
-            new RefactorData("Use async / await instead of promises",
-                             KnownMonikers.AsynchronousMessage,
-                             null,
-                             [
-                                 Packets.Language.LANGUAGE_TYPESCRIPT,
-                                 Packets.Language.LANGUAGE_JAVASCRIPT,
-                                 Packets.Language.LANGUAGE_TSX
-                             ]),
-
-            new RefactorData("Verbosely comment this code so that I can understand what's going on",
-                             KnownMonikers.CommentCode),
+        RefactorData[] commandPresets = [
+            new RefactorData("Add comments and docstrings", KnownMonikers.AddComment),
+            new RefactorData("Add logging for debugging", KnownMonikers.StartLogging),
+            new RefactorData("Generate Unit Tests", KnownMonikers.UnitTest,
+                             "Generate unit tests for this code using the most appropriate testing framework. Cover edge cases and happy paths."),
+            new RefactorData("Clean up and standardize code", KnownMonikers.CleanData,
+                             "Clean up this code by standardizing variable names, removing debugging statements, and improving readability."),
+            new RefactorData("Check for bugs and null pointers", KnownMonikers.Spy,
+                             "Check for bugs such as null pointer references and unhandled exceptions."),
+            new RefactorData("Implement code for TODO comments", KnownMonikers.ImplementInterface),
+            new RefactorData("Fix linter errors and warnings", KnownMonikers.DocumentWarning, null, [Packets.Language.LANGUAGE_PYTHON]),
+            new RefactorData("Optimize performance", KnownMonikers.EventPublic),
+            new RefactorData("Convert to async / await", KnownMonikers.AsynchronousMessage, null,
+                             [Packets.Language.LANGUAGE_TYPESCRIPT, Packets.Language.LANGUAGE_JAVASCRIPT, Packets.Language.LANGUAGE_TSX]),
+            new RefactorData("Add detailed explanations", KnownMonikers.CommentCode),
         ];
 
-        // remove old buttons
-        // TODO: find a better way to do this, just hide them by language, but that interferes with
-        // the search
-        if (Panel.Children.Count > 1) Panel.Children.RemoveRange(1, Panel.Children.Count - 1);
-
-        foreach (RefactorData data in CommandPresets)
+        // Clear existing preset buttons safely (keep the "PRESETS" title if it's the first child)
+        if (PresetsPanel != null)
         {
-            if (data.whiteListLanguages != null &&
-                !data.whiteListLanguages.Contains(languageInfo.Type))
-                continue;
+            while (PresetsPanel.Children.Count > 1)
+            {
+                PresetsPanel.Children.RemoveAt(1);
+            }
 
-            TextBlock textBlock = new();
-            textBlock.Inlines.Add(
-                new CrispImage() { Moniker = data.image, Margin = new Thickness(0, 0, 3, -3) });
+            Style? buttonStyle = Resources["ModernButtonStyle"] as Style;
 
-            textBlock.Inlines.Add(data.text);
+            foreach (RefactorData data in commandPresets)
+            {
+                if (data.whiteListLanguages != null && !data.whiteListLanguages.Contains(languageInfo.Type))
+                    continue;
 
-            Button btn = new() { Content = textBlock };
-            btn.Click += (s, e) =>
-            { ReturnResult(data.prompt); };
+                StackPanel btnContent = new() { Orientation = Orientation.Horizontal };
+                btnContent.Children.Add(new CrispImage() { Moniker = data.image, Width = 16, Height = 16, Margin = new Thickness(0, 0, 10, 0) });
+                btnContent.Children.Add(new TextBlock() { Text = data.text, FontSize = 13, VerticalAlignment = VerticalAlignment.Center });
 
-            Panel.Children.Add(btn);
+                Button btn = new() 
+                { 
+                    Content = btnContent,
+                    Style = buttonStyle,
+                    HorizontalContentAlignment = HorizontalAlignment.Left
+                };
+                btn.Click += (s, e) => { ReturnResult(data.prompt); };
+
+                PresetsPanel.Children.Add(btn);
+            }
         }
     }
 
     private void ReturnResult(string result)
     {
+        if (string.IsNullOrWhiteSpace(result)) return;
         Result = result;
         CloseDialog();
     }
@@ -176,15 +123,13 @@ public partial class RefactorCodeDialogWindow : DialogWindow
         // set dark title bar
         bool value = true;
         IntPtr hwnd = new System.Windows.Interop.WindowInteropHelper(this).Handle;
-        DwmSetWindowAttribute(
-            hwnd, 20, ref value, System.Runtime.InteropServices.Marshal.SizeOf(value));
+        DwmSetWindowAttribute(hwnd, 20, ref value, System.Runtime.InteropServices.Marshal.SizeOf(value));
     }
 
     protected override void OnDeactivated(EventArgs e) { CloseDialog(); }
 
     [DllImport("dwmapi.dll", PreserveSig = true)]
-    public static extern int DwmSetWindowAttribute(IntPtr hwnd, int attr, ref bool attrValue,
-                                                   int attrSize);
+    public static extern int DwmSetWindowAttribute(IntPtr hwnd, int attr, ref bool attrValue, int attrSize);
 
     private void Window_MouseLeftButtonDown(object sender, MouseButtonEventArgs e) { DragMove(); }
 
@@ -195,36 +140,29 @@ public partial class RefactorCodeDialogWindow : DialogWindow
 
     private void InputPrompt_TextChanged(object sender, TextChangedEventArgs e)
     {
-        if (InputPrompt.Text.Length == 0)
-        {
-            foreach (var child in Panel.Children)
-            {
-                if (child is Button btn && btn.Content is TextBlock)
-                {
-                    btn.Visibility = Visibility.Visible;
-                }
-            }
-            InputPromptHint.Visibility = Visibility.Visible;
-            return;
-        }
+        if (InputPromptHint == null || PresetsPanel == null) return;
 
-        InputPromptHint.Visibility = Visibility.Collapsed;
+        bool hasText = !string.IsNullOrEmpty(InputPrompt.Text);
+        InputPromptHint.Visibility = hasText ? Visibility.Collapsed : Visibility.Visible;
+
         string search = InputPrompt.Text.ToLower();
 
-        foreach (var child in Panel.Children)
+        for (int i = 1; i < PresetsPanel.Children.Count; i++)
         {
-            if (child is Button btn && btn.Content is TextBlock textBlock)
+            if (PresetsPanel.Children[i] is Button btn && btn.Content is StackPanel sp)
             {
-                var el = textBlock.Inlines.ElementAt(1) as System.Windows.Documents.Run;
-
-                btn.Visibility =
-                    el.Text.ToLower().Contains(search) ? Visibility.Visible : Visibility.Collapsed;
+                var textBlock = sp.Children.OfType<TextBlock>().FirstOrDefault();
+                if (textBlock != null)
+                {
+                    btn.Visibility = string.IsNullOrEmpty(search) || textBlock.Text.ToLower().Contains(search) 
+                                     ? Visibility.Visible : Visibility.Collapsed;
+                }
             }
         }
     }
 
-    private void InputPrompt_KeyDown(object sender, System.Windows.Input.KeyEventArgs e)
+    private void InputPrompt_KeyDown(object sender, KeyEventArgs e)
     {
-        if (e.Key == System.Windows.Input.Key.Return) { ReturnResult(InputPrompt.Text); }
+        if (e.Key == Key.Return) { ReturnResult(InputPrompt.Text); }
     }
 }

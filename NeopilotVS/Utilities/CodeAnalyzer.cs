@@ -14,6 +14,13 @@ internal static class CodeAnalyzer
     private static readonly Dictionary<Guid, object> _languageServices = [];
 
     // This method will return a Span(0,0) if not found
+    /// <summary>
+    /// Gets the span of the code block at the specified position.
+    /// </summary>
+    /// <param name="view">The text view.</param>
+    /// <param name="position">The cursor position.</param>
+    /// <param name="outtag">The resulting structure tag, if found.</param>
+    /// <returns>The span of the block.</returns>
     public static Span GetBlockSpan(ITextView view, int position, out IStructureTag? outtag)
     {
         outtag = null;
@@ -82,6 +89,12 @@ internal static class CodeAnalyzer
         return new Span(start, end - start);
     }
 
+    /// <summary>
+    /// Asynchronously retrieves a language service by its ID.
+    /// </summary>
+    /// <typeparam name="T">The type of the service.</typeparam>
+    /// <param name="languageServiceId">The GUID of the language service.</param>
+    /// <returns>The service instance, or null if not found.</returns>
     public static async Task<T?> GetLanguageServiceAsync<T>(Guid languageServiceId)
         where T : class
     {
@@ -112,6 +125,13 @@ internal static class CodeAnalyzer
         return languageService as T;
     }
 
+    /// <summary>
+    /// Asynchronously gets information about the function block at the specified location.
+    /// </summary>
+    /// <param name="view">The text view.</param>
+    /// <param name="line">Line number (0-indexed).</param>
+    /// <param name="column">Column number (0-indexed).</param>
+    /// <returns>A FunctionBlock object with metadata, or null.</returns>
     public static async Task<FunctionBlock?> GetFunctionBlockAsync(IWpfTextView view, int line,
                                                                    int column)
     {

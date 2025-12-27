@@ -12,116 +12,128 @@
                         toolkit:Themes.UseVsTheme="True"
 
                         WindowStyle="None"
-                        ResizeMode="CanResize"
+                        ResizeMode="NoResize"
+                        AllowsTransparency="True"
                         mc:Ignorable="d"
 
-                        Title="Neopilot Refactor Code Block"
+                        Title="Neopilot Refactor"
                         WindowStartupLocation="CenterOwner"
 
-                        Width="450"
-                        Height="450"
-                        MinWidth="450"
-                        MinHeight="200"
-
+                        Width="500"
+                        Height="550"
+                        
                         MouseLeftButtonDown="Window_MouseLeftButtonDown"
                         PreviewKeyDown="Window_PreviewKeyDown"
-
-                        Background="{DynamicResource {x:Static platform:CommonControlsColors.ComboBoxListBackgroundBrushKey}}"
-                        d:DesignHeight="450"
-                        d:DesignWidth="450"
+                        Background="Transparent"
                         >
-                        <!--ShowInTaskbar="False"-->
 
     <platform:DialogWindow.Resources>
-
         <ResourceDictionary>
-
             <platform:BrushToColorConverter x:Key="BrushToColorConverter"/>
-            <Style TargetType="Button">
-
-                <Setter Property="platform:ImageThemingUtilities.ImageBackgroundColor"
-                        Value="{Binding Background, RelativeSource={RelativeSource Self}, Converter={StaticResource BrushToColorConverter}}"
-                        />
-
+            
+            <Style x:Key="ModernButtonStyle" TargetType="Button">
+                <Setter Property="Background" Value="Transparent"/>
+                <Setter Property="Foreground" Value="{DynamicResource {x:Static vsshell:VsBrushes.WindowTextKey}}"/>
+                <Setter Property="BorderThickness" Value="0"/>
+                <Setter Property="Padding" Value="12,8"/>
                 <Setter Property="HorizontalContentAlignment" Value="Left"/>
-                <Setter Property="Margin" Value="0,0,0,-1"/>
-                <Setter Property="Padding" Value="10,0,0,0"/>
-
-                <Setter Property="Height" Value="30"/>
-                <Setter Property="Background" Value="{DynamicResource {x:Static platform:CommonControlsColors.ComboBoxListBackgroundBrushKey}}"/>
-                <Setter Property="Foreground" Value="{DynamicResource {x:Static vsshell:VsBrushes.WindowTextKey}}"/>
-                <Setter Property="BorderBrush" Value="Transparent"/>
+                <Setter Property="Cursor" Value="Hand"/>
                 <Setter Property="Template">
                     <Setter.Value>
                         <ControlTemplate TargetType="Button">
-                            <Border Background="{TemplateBinding Background}" BorderBrush="{TemplateBinding BorderBrush}" BorderThickness="1">
-                                <ContentPresenter Margin="{TemplateBinding Padding}" VerticalAlignment="Center" Content="{TemplateBinding Content}" HorizontalAlignment="{TemplateBinding HorizontalAlignment}" />
+                            <Border x:Name="bg" Background="{TemplateBinding Background}" CornerRadius="4" Margin="2,1">
+                                <ContentPresenter VerticalAlignment="Center" Margin="{TemplateBinding Padding}"/>
                             </Border>
+                            <ControlTemplate.Triggers>
+                                <Trigger Property="IsMouseOver" Value="True">
+                                    <Setter TargetName="bg" Property="Background" Value="{DynamicResource {x:Static platform:CommonControlsColors.ButtonHoverBrushKey}}"/>
+                                </Trigger>
+                                <Trigger Property="IsPressed" Value="True">
+                                    <Setter TargetName="bg" Property="Background" Value="{DynamicResource {x:Static platform:CommonControlsColors.ButtonPressedBrushKey}}"/>
+                                </Trigger>
+                            </ControlTemplate.Triggers>
                         </ControlTemplate>
                     </Setter.Value>
                 </Setter>
-                <Style.Triggers>
-                    <Trigger Property="IsMouseOver" Value="True">
-                        <Setter Property="Background" Value="{DynamicResource {x:Static platform:CommonControlsColors.ButtonHoverBrushKey}}"/>
-                        <Setter Property="BorderBrush" Value="{DynamicResource {x:Static platform:CommonControlsColors.CheckBoxBorderFocusedBrushKey}}"/>
-                    </Trigger>
-                </Style.Triggers>
             </Style>
-            <Style x:Key="SendButton" TargetType="Button">
-                <Setter Property="platform:ImageThemingUtilities.ImageBackgroundColor"
-                        Value="{Binding Background, RelativeSource={RelativeSource Self}, Converter={StaticResource BrushToColorConverter}}"
-                        />
-                <Setter Property="HorizontalAlignment" Value="Right"/>
-                <Setter Property="Width" Value="30"/>
-                <Setter Property="ToolTip" Value="Ask Neopilot"/>
-                <Setter Property="Background" Value="{StaticResource {x:Static platform:CommonControlsColors.TextBoxBackgroundFocusedBrushKey}}"/>
-                <Setter Property="Foreground" Value="{DynamicResource {x:Static vsshell:VsBrushes.WindowTextKey}}"/>
-                <Setter Property="BorderBrush" Value="Transparent"/>
 
+            <Style x:Key="ActionButtonStyle" TargetType="Button">
+                <Setter Property="Background" Value="{DynamicResource {x:Static platform:CommonControlsColors.ButtonDefaultBrushKey}}"/>
+                <Setter Property="Foreground" Value="{DynamicResource {x:Static platform:CommonControlsColors.ButtonDefaultTextBrushKey}}"/>
+                <Setter Property="Padding" Value="10,5"/>
                 <Setter Property="Template">
                     <Setter.Value>
                         <ControlTemplate TargetType="Button">
-                            <Border Background="{TemplateBinding Background}" BorderBrush="{TemplateBinding BorderBrush}" BorderThickness="1">
-                                <ContentPresenter Margin="{TemplateBinding Padding}" VerticalAlignment="Center" Content="{TemplateBinding Content}" HorizontalAlignment="{TemplateBinding HorizontalAlignment}" />
+                            <Border x:Name="bg" Background="{TemplateBinding Background}" CornerRadius="4" BorderThickness="1" BorderBrush="{DynamicResource {x:Static platform:CommonControlsColors.ButtonBorderBrushKey}}">
+                                <ContentPresenter HorizontalAlignment="Center" VerticalAlignment="Center"/>
                             </Border>
+                            <ControlTemplate.Triggers>
+                                <Trigger Property="IsMouseOver" Value="True">
+                                    <Setter TargetName="bg" Property="Background" Value="{DynamicResource {x:Static platform:CommonControlsColors.ButtonHoverBrushKey}}"/>
+                                </Trigger>
+                            </ControlTemplate.Triggers>
                         </ControlTemplate>
                     </Setter.Value>
                 </Setter>
-                <Style.Triggers>
-                    <Trigger Property="IsMouseOver" Value="True">
-                        <Setter Property="Background" Value="{DynamicResource {x:Static platform:CommonControlsColors.ButtonHoverBrushKey}}"/>
-                        <Setter Property="BorderBrush" Value="{DynamicResource {x:Static platform:CommonControlsColors.CheckBoxBorderFocusedBrushKey}}"/>
-                    </Trigger>
-                </Style.Triggers>
             </Style>
-
         </ResourceDictionary>
     </platform:DialogWindow.Resources>
 
-    <Border BorderThickness="1" BorderBrush="{DynamicResource {x:Static platform:CommonControlsColors.ComboBoxBorderBrushKey}}">
-        <Grid FocusManager.FocusedElement="{Binding ElementName=InputPrompt}" Margin="10,20,10,10">
+    <Border CornerRadius="8" BorderThickness="1" Background="{DynamicResource {x:Static platform:CommonControlsColors.ComboBoxListBackgroundBrushKey}}" BorderBrush="{DynamicResource {x:Static platform:CommonControlsColors.ComboBoxBorderBrushKey}}">
+        <Grid Margin="1">
             <Grid.RowDefinitions>
+                <RowDefinition Height="Auto"/>
                 <RowDefinition Height="Auto"/>
                 <RowDefinition Height="*"/>
             </Grid.RowDefinitions>
-            
-            <Grid Grid.Row="0" Margin="0,0,0,10">
-                <TextBox x:Name="InputPrompt" KeyDown="InputPrompt_KeyDown" TextChanged="InputPrompt_TextChanged" 
-                         Height="30" VerticalContentAlignment="Center" Padding="5,0,35,0"/>
 
-                <Label x:Name="InputPromptHint" Margin="5,0,35,0" VerticalAlignment="Center" IsHitTestVisible="False"
-                   Foreground="{DynamicResource {x:Static platform:CommonControlsColors.TextBoxTextDisabledBrushKey}}"
-                   Padding="2,0,0,0">
-                    Ask Neopilot anything! Or you can just select from the presets below...
-                </Label>
-
-                <Button Style="{StaticResource SendButton}" HorizontalAlignment="Right" VerticalAlignment="Center" Margin="0,0,0,0">
-                    <imaging:CrispImage Width="16" Height="16" Moniker="{x:Static imagecatalog:KnownMonikers.Send}" />
+            <!-- Header / Title Bar Area -->
+            <Grid Grid.Row="0" Margin="15,15,15,10">
+                <StackPanel Orientation="Horizontal" VerticalAlignment="Center">
+                    <imaging:CrispImage Moniker="{x:Static imagecatalog:KnownMonikers.MagicWand}" Width="18" Height="18" Margin="0,0,8,0"/>
+                    <TextBlock Text="Refactor with Neopilot" FontSize="16" FontWeight="SemiBold" Foreground="{DynamicResource {x:Static vsshell:VsBrushes.WindowTextKey}}"/>
+                </StackPanel>
+                <Button HorizontalAlignment="Right" Style="{StaticResource ModernButtonStyle}" Padding="5" Click="CloseButton_Click">
+                    <imaging:CrispImage Moniker="{x:Static imagecatalog:KnownMonikers.Close}" Width="14" Height="14"/>
                 </Button>
             </Grid>
 
-            <ScrollViewer Grid.Row="1" HorizontalScrollBarVisibility="Disabled" VerticalScrollBarVisibility="Auto">
-                <StackPanel x:Name="PresetsPanel" Orientation="Vertical"/>
+            <!-- Input Area -->
+            <Grid Grid.Row="1" Margin="15,5">
+                <Border CornerRadius="6" BorderThickness="1" BorderBrush="{DynamicResource {x:Static platform:CommonControlsColors.TextBoxBorderBrushKey}}" Background="{DynamicResource {x:Static platform:CommonControlsColors.TextBoxBackgroundBrushKey}}">
+                    <Grid>
+                        <TextBox x:Name="InputPrompt" 
+                                 Background="Transparent" 
+                                 BorderThickness="0" 
+                                 Padding="10,8,40,8" 
+                                 FontSize="14"
+                                 VerticalContentAlignment="Center"
+                                 KeyDown="InputPrompt_KeyDown" 
+                                 TextChanged="InputPrompt_TextChanged"
+                                 vsshell:CaretBrushHelper.CaretBrush="{DynamicResource {x:Static vsshell:VsBrushes.WindowTextKey}}"/>
+                        
+                        <TextBlock x:Name="InputPromptHint" 
+                                   IsHitTestVisible="False" 
+                                   Text="Describe your refactor or select a preset..." 
+                                   Margin="13,0,0,0" 
+                                   VerticalAlignment="Center" 
+                                   Foreground="{DynamicResource {x:Static platform:CommonControlsColors.TextBoxTextDisabledBrushKey}}" 
+                                   FontSize="13" 
+                                   FontStyle="Italic"/>
+
+                        <Button HorizontalAlignment="Right" Margin="0,0,5,0" Style="{StaticResource ModernButtonStyle}" Padding="5" Click="SendButton_Click">
+                            <imaging:CrispImage Moniker="{x:Static imagecatalog:KnownMonikers.Send}" Width="16" Height="16"/>
+                        </Button>
+                    </Grid>
+                </Border>
+            </Grid>
+
+            <!-- Presets Area -->
+            <ScrollViewer Grid.Row="2" Margin="10,10,10,15" VerticalScrollBarVisibility="Auto">
+                <StackPanel x:Name="PresetsPanel" Margin="5">
+                    <TextBlock Text="PRESETS" FontSize="10" FontWeight="Bold" Margin="6,0,0,8" Foreground="{DynamicResource {x:Static platform:CommonControlsColors.TextBoxTextDisabledBrushKey}}" Opacity="0.7"/>
+                    <!-- Presets will be injected here -->
+                </StackPanel>
             </ScrollViewer>
         </Grid>
     </Border>

@@ -101,8 +101,11 @@ public class NeopilotDataPoint : IAsyncCodeLensDataPoint
     private static readonly CodeLensDetailEntryCommand goDocCommand =
         new CodeLensDetailEntryCommand { CommandSet = PackageGuids.NeopilotVS,
                                          CommandId = PackageIds.GenerateSelectionFunctionDocstring,
-                                         CommandName =
-                                             "Neopilot.GenerateSelectionFunctionDocstring" };
+                                         CommandName = "Neopilot.GenerateSelectionFunctionDocstring" };
+    private static readonly CodeLensDetailEntryCommand findSimilarCommand =
+        new CodeLensDetailEntryCommand { CommandSet = PackageGuids.NeopilotVS,
+                                         CommandId = PackageIds.FindSimilarSelectionCodeBlock,
+                                         CommandName = "Neopilot.FindSimilarSelectionCodeBlock" };
 
     private VisualStudioConnectionHandler? visualStudioConnection;
 
@@ -200,6 +203,9 @@ public class NeopilotDataPoint : IAsyncCodeLensDataPoint
                                                   CommandArgs = new object[] { context } },
                 new CodeLensDetailPaneCommand() { CommandId = explainCommand,
                                                   CommandDisplayName = "Explain",
+                                                  CommandArgs = new object[] { context } },
+                new CodeLensDetailPaneCommand() { CommandId = findSimilarCommand,
+                                                  CommandDisplayName = "Find Similar",
                                                   CommandArgs = new object[] { context } },
             };
 

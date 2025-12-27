@@ -68,6 +68,11 @@ internal static class FileUtilities
         return result.Where(dir => CountPathSegments(dir) > 1).ToList();
     }
 
+    /// <summary>
+    /// Gets the minimum set of directories that covers all provided directories.
+    /// </summary>
+    /// <param name="directories">The list of directory paths.</param>
+    /// <returns>A list of directories that cover all inputs with minimum redundancy.</returns>
     public static List<string> GetMinimumDirectoryCover(IEnumerable<string> directories)
     {
         // 1. Normalize all paths to full/absolute paths and remove duplicates
@@ -125,6 +130,8 @@ internal static class FileUtilities
     /// <summary>
     /// Normalize a directory path by getting its full path (removing trailing slash, etc).
     /// </summary>
+    /// <param name="path">The path to normalize.</param>
+    /// <returns>The normalized absolute path.</returns>
     private static string NormalizePath(string path)
     {
         return Path.GetFullPath(path).TrimEnd(Path.DirectorySeparatorChar,
@@ -133,8 +140,9 @@ internal static class FileUtilities
 
     /// <summary>
     /// Count path segments based on splitting by directory separators.
-    /// E.g. "C:\Folder\Sub" -> 3 segments (on Windows).
     /// </summary>
+    /// <param name="path">The path to count segments in.</param>
+    /// <returns>The number of segments.</returns>
     private static int CountPathSegments(string path)
     {
         return path.Split(Path.DirectorySeparatorChar, Path.AltDirectorySeparatorChar)

@@ -137,6 +137,8 @@
     <Compile Include="Commands\CommandCompleteSuggestion.cs" />
     <Compile Include="Commands\CommandExplainCodeBlock.cs" />
     <Compile Include="Commands\CommandExplainSelectionCodeBlock.cs" />
+    <Compile Include="Commands\CommandFindSimilarCode.cs" />
+    <Compile Include="Commands\CommandFindSimilarSelectionCodeBlock.cs" />
     <Compile Include="Commands\CommandGenerateFunctionDocstring.cs" />
     <Compile Include="Commands\CommandGenerateFunctionUnitTest.cs" />
     <Compile Include="Commands\CommandGenerateSelectionFunctionDocstring.cs" />

@@ -39,6 +39,8 @@ internal sealed partial class PackageIds
     public const int RefactorSelectionCodeBlock = 0x0110;
     public const int ExplainSelectionCodeBlock = 0x0111;
     public const int GenerateSelectionFunctionDocstring = 0x0112;
+    public const int FindSimilarCode = 0x0113;
+    public const int FindSimilarSelectionCodeBlock = 0x0114;
     public const int DebugButton = 0x0600;
 }
 }

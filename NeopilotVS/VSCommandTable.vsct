@@ -136,6 +136,19 @@
 				</Strings>
 			</Button>
 
+			<!-- Find Similar Code -->
+			<Button guid="NeopilotVS" id="FindSimilarCode" priority="0x0004" type="Button">
+				<Parent guid="NeopilotVS" id="ContextGroupNeopilot" />
+				<Icon guid="ImageCatalogGuid" id="Search" />
+				<CommandFlag>IconIsMoniker</CommandFlag>
+				<CommandFlag>DefaultInvisible</CommandFlag>
+				<CommandFlag>DynamicVisibility</CommandFlag>
+				<Strings>
+					<ButtonText>Neopilot: Find Similar Code</ButtonText>
+					<LocCanonicalName>Neopilot.FindSimilarCode</LocCanonicalName>
+				</Strings>
+			</Button>
+
       <!-- ShowNextSuggestion -->
       <Button guid="NeopilotVS" id="ShowNextSuggestion" priority="0x0003" type="Button">
         <Icon guid="ImageCatalogGuid" id="AddTest" />
@@ -189,6 +202,17 @@
         </Strings>
       </Button>
 
+      <!-- Find Similar Selection Code Block -->
+      <Button guid="NeopilotVS" id="FindSimilarSelectionCodeBlock" priority="0x0003" type="Button">
+        <Parent guid="NeopilotVS" id="ContextGroupNeopilot" />
+        <Icon guid="ImageCatalogGuid" id="Search" />
+        <CommandFlag>DefaultInvisible</CommandFlag>
+        <Strings>
+          <ButtonText>Neopilot: Find Similar Code</ButtonText>
+          <LocCanonicalName>Neopilot.FindSimilarSelectionCodeBlock</LocCanonicalName>
+        </Strings>
+      </Button>
+
       <!-- Debug button --><!--
 			<Button guid="NeopilotVS" id="DebugButton" priority="0x0004" type="Button">
 				<Parent guid="NeopilotVS" id="ContextGroupNeopilot" />
@@ -226,6 +250,8 @@
       <IDSymbol name="ExplainSelectionCodeBlock"           value="0x0111" />
       <IDSymbol name="RefactorSelectionCodeBlock"          value="0x0110" />
       <IDSymbol name="GenerateSelectionFunctionDocstring"  value="0x0112" />
+      <IDSymbol name="FindSimilarCode"                     value="0x0113" />
+      <IDSymbol name="FindSimilarSelectionCodeBlock"       value="0x0114" />
 
 
       <IDSymbol name="DebugButton"                value="0x0600" />
