@@ -15,6 +15,7 @@ public class SettingsPage : DialogPage
     private bool enableIndexing = true;
     private bool enableCodeLens = true;
     private int indexingMaxFileCount = 5000;
+    private int indexingMaxProjectCount = 10;
     private string indexingFilesListPath = "";
     private bool indexOpenFiles = true;
 
@@ -140,6 +141,20 @@ public class SettingsPage : DialogPage
         }
         set {
             indexingMaxFileCount = value;
+        }
+    }
+
+    [Category("Neopilot")]
+    [DisplayName("Indexing Max Project Count")]
+    [Description("The maximum number of distinct projects Neopilot will attempt to index in a " +
+                 "single session. Requires restart.")]
+    public int IndexingMaxProjectCount
+    {
+        get {
+            return indexingMaxProjectCount;
+        }
+        set {
+            indexingMaxProjectCount = value;
         }
     }
 

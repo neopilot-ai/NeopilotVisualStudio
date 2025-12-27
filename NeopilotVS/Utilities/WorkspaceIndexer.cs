@@ -86,7 +86,7 @@ public class WorkspaceIndexer
         }
 
         List<string> projectsToIndex = new List<string>(inputDirectoriesToIndex);
-        int maxToIndex = 10;
+        int maxToIndex = _package.SettingsPage.IndexingMaxProjectCount;
         projectsToIndex.AddRange(await GetDirectoriesToIndex(
             inputDirectoriesToIndex, openFileProjects, maxToIndex - projectsToIndex.Count, dte));
         await _package.LogAsync($"Number of projects to index: {projectsToIndex.Count}");

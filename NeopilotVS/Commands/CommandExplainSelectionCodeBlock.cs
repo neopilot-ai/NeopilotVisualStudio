@@ -31,13 +31,13 @@ internal class CommandExplainSelectionCodeBlock : BaseCommandCodeLens<CommandExp
                 await ResolveCodeBlock(startLine);
                 if (functionInfo != null)
                 {
-                    controller.ExplainFunctionAsync(docView.FilePath, functionInfo);
+                    await controller.ExplainFunctionAsync(docView.FilePath, functionInfo);
                 }
                 else
                 {
                     if (classInfo == null) return;
                     CodeBlockInfo codeBlockInfo = ClassToCodeBlock(classInfo);
-                    controller.ExplainCodeBlockAsync(
+                    await controller.ExplainCodeBlockAsync(
                         docView.FilePath, languageInfo.Type, codeBlockInfo);
                 }
             }

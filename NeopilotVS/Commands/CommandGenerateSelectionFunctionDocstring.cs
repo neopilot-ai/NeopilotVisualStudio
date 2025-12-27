@@ -31,7 +31,7 @@ internal class CommandGenerateSelectionFunctionDocstring
                 await ResolveCodeBlock(startLine);
                 if (functionInfo != null)
                 {
-                    controller.GenerateFunctionDocstringAsync(docView.FilePath, functionInfo);
+                    await controller.GenerateFunctionDocstringAsync(docView.FilePath, functionInfo);
                 }
             }
         }

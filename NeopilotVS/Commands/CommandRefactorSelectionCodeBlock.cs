@@ -52,7 +52,7 @@ internal class CommandRefactorSelectionCodeBlock
                 if (prompt == null) return;
                 if (functionInfo != null)
                 {
-                    controller.RefactorFunctionAsync(prompt, docView.FilePath, functionInfo);
+                    await controller.RefactorFunctionAsync(prompt, docView.FilePath, functionInfo);
                 }
                 else
                 {

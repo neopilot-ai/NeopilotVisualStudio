@@ -91,16 +91,16 @@ public class NeopilotDataPoint : IAsyncCodeLensDataPoint
 {
     private static readonly CodeLensDetailEntryCommand refactorCommand =
         new CodeLensDetailEntryCommand { CommandSet = PackageGuids.NeopilotVS,
-                                         CommandId = 0x0110,
+                                         CommandId = PackageIds.RefactorSelectionCodeBlock,
                                          CommandName = "Neopilot.RefactorSelectionCodeBlock" };
 
     private static readonly CodeLensDetailEntryCommand explainCommand =
         new CodeLensDetailEntryCommand { CommandSet = PackageGuids.NeopilotVS,
-                                         CommandId = 0x0111,
+                                         CommandId = PackageIds.ExplainSelectionCodeBlock,
                                          CommandName = "Neopilot.ExplainSelectionCodeBlock" };
     private static readonly CodeLensDetailEntryCommand goDocCommand =
         new CodeLensDetailEntryCommand { CommandSet = PackageGuids.NeopilotVS,
-                                         CommandId = 0x0112,
+                                         CommandId = PackageIds.GenerateSelectionFunctionDocstring,
                                          CommandName =
                                              "Neopilot.GenerateSelectionFunctionDocstring" };
 
