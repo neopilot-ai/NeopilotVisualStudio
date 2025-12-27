@@ -185,30 +185,15 @@ public sealed class NeopilotVSPackage : ToolkitPackage
         }
     }
 
-    public string GetAppDataPath()
-    {
-        string appData = Environment.GetFolderPath(Environment.SpecialFolder.ApplicationData);
-        return Path.Combine(appData, ".neopilot");
-    }
+    public string GetAppDataPath() => Utilities.PathProvider.GetAppDataPath();
 
-    public string GetLanguageServerFolder()
-    {
-        return Path.Combine(GetAppDataPath(), $"language_server_v{LanguageServer.GetVersion()}");
-    }
+    public string GetLanguageServerFolder() => Utilities.PathProvider.GetLanguageServerFolder(LanguageServer.GetVersion());
 
-    public string GetLanguageServerPath()
-    {
-        string binaryName = "language_server_windows_x64.exe";
-        if (SettingsPage.EnterpriseMode)
-        {
-            binaryName = "language_server_windows_x64_enterprise.exe";
-        }
-        return Path.Combine(GetLanguageServerFolder(), binaryName);
-    }
+    public string GetLanguageServerPath() => Utilities.PathProvider.GetLanguageServerPath(LanguageServer.GetVersion(), SettingsPage.EnterpriseMode);
 
-    public string GetDatabaseDirectory() { return Path.Combine(GetAppDataPath(), "database"); }
+    public string GetDatabaseDirectory() => Utilities.PathProvider.GetDatabaseDirectory();
 
-    public string GetAPIKeyPath() { return Path.Combine(GetAppDataPath(), "neopilot_api_key"); }
+    public string GetAPIKeyPath() => Utilities.PathProvider.GetAPIKeyPath();
 
     public bool IsSignedIn() { return LanguageServer.GetKey().Length > 0; }
     public bool HasEnterprise() { return SettingsPage.EnterpriseMode; }

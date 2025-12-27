@@ -122,6 +122,7 @@
     <Compile Include="SuggestionUI\TextViewListener.cs" />
     <Compile Include="Utilities\Extensions.cs" />
     <Compile Include="Utilities\FileUtilities.cs" />
+    <Compile Include="Utilities\PathProvider.cs" />
     <Compile Include="Utilities\WorkspaceIndexer.cs" />
     <Compile Include="Utilities\IntellisenseUtilities.cs" />
     <Compile Include="Utilities\ProcessExtensions.cs" />
