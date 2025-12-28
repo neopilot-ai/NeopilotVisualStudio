@@ -19,7 +19,7 @@ namespace NeopilotVS
     public class LanguageServerInstaller
     {
         private readonly NeopilotVSPackage _package;
-        private string _languageServerVersion = "1.42.7";
+        private string _languageServerVersion = "1.50.100";
         private string _languageServerURL;
 
         public LanguageServerInstaller(NeopilotVSPackage package)
@@ -36,6 +36,7 @@ namespace NeopilotVS
 
             if (File.Exists(binaryPath))
             {
+                await _package.LanguageServer.OnInstallationCompleted();
                 return;
             }
 

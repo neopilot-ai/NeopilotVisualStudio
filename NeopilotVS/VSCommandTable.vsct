@@ -82,6 +82,17 @@
 				</Strings>
 			</Button>
 
+			<!-- Restart Language Server button -->
+			<Button guid="NeopilotVS" id="RestartLanguageServer" priority="0x0200" type="Button">
+				<Parent guid="NeopilotVS" id="ToolsButtonsGroup" />
+				<Icon guid="ImageCatalogGuid" id="Restart" />
+				<CommandFlag>IconIsMoniker</CommandFlag>
+				<Strings>
+					<ButtonText>Restart Language Server</ButtonText>
+					<LocCanonicalName>.Extensions.Neopilot.RestartLanguageServer</LocCanonicalName>
+				</Strings>
+			</Button>
+
 			<!-- Explain code block / function button -->
 			<Button guid="NeopilotVS" id="ExplainCodeBlock" priority="0x0000" type="Button">
 				<Parent guid="NeopilotVS" id="ContextGroupNeopilot" />
@@ -252,6 +263,7 @@
       <IDSymbol name="GenerateSelectionFunctionDocstring"  value="0x0112" />
       <IDSymbol name="FindSimilarCode"                     value="0x0113" />
       <IDSymbol name="FindSimilarSelectionCodeBlock"       value="0x0114" />
+      <IDSymbol name="RestartLanguageServer"               value="0x0115" />
 
 
       <IDSymbol name="DebugButton"                value="0x0600" />

@@ -146,6 +146,7 @@
     <Compile Include="Commands\CommandRefactorCodeBlock.cs" />
     <Compile Include="Commands\CommandRefactorSelectionCodeBlock.cs" />
     <Compile Include="Commands\CommandShowNextSuggestion.cs" />
+    <Compile Include="Commands\CommandRestartLanguageServer.cs" />
     <Compile Include="Commands\CommandSignIn.cs" />
     <Compile Include="Commands\CommandSignOut.cs" />
     <Compile Include="OutputWindow.cs" />

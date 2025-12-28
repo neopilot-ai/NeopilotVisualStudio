@@ -13,7 +13,7 @@ internal sealed partial class Vsix
         @"The modern coding superpower: free AI code acceleration plugin for your favorite " +
         @"languages. Type less. Code more. Ship faster.";
     public const string Language = "en-US";
-    public const string Version = "1.8.82";
+    public const string Version = "2.0.0";
     public const string Author = "Neopilot";
     public const string Tags = "";
 }

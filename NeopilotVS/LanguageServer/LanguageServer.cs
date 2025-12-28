@@ -25,6 +25,7 @@ public class LanguageServer : IDisposable
 
     private int _port = 0;
     private System.Diagnostics.Process _process;
+    private TaskCompletionSource<bool> _readyTcs = new();
     
     private readonly Metadata _metadata;
     private readonly HttpClient _httpClient;
@@ -102,10 +103,8 @@ public class LanguageServer : IDisposable
     public bool IsReady() { return _port != 0; }
     public async Task WaitReadyAsync()
     {
-        while (!IsReady())
-        {
-            await Task.Delay(50);
-        }
+        if (IsReady()) return;
+        await _readyTcs.Task;
     }
 
     // Get API key from the authentication token
@@ -142,6 +141,31 @@ public class LanguageServer : IDisposable
         File.WriteAllText(_package.GetAPIKeyPath(), _metadata.api_key);
         await _package.LogAsync("Signed in successfully");
         await _package.UpdateSignedInStateAsync();
+    }
+
+    // Update user settings on the language server
+    public async Task UpdateUserSettingsAsync(bool openMostRecentChat)
+    {
+        UpdateUserSettingsRequest data = new() {
+            user_settings = new UserSettings {
+                open_most_recent_chat_conversation = openMostRecentChat
+            }
+        };
+
+        await RequestCommandAsync<UpdateUserSettingsResponse>("UpdateUserSettings", data);
+    }
+
+    // Record feedback for a chat message
+    public async Task RecordChatFeedbackAsync(string messageId, ChatFeedbackType feedback, string reason = "")
+    {
+        RecordChatFeedbackRequest data = new() {
+            metadata = GetMetadata(),
+            message_id = messageId,
+            feedback = feedback,
+            reason = reason
+        };
+
+        await RequestCommandAsync<RecordChatFeedbackResponse>("RecordChatFeedback", data);
     }
 
     // Open the browser to sign in
@@ -207,6 +231,7 @@ public class LanguageServer : IDisposable
     public async Task StartAsync(bool ignoreDigitalSignature = true)
     {
         _port = 0;
+        _readyTcs = new TaskCompletionSource<bool>();
 
         if (!ignoreDigitalSignature && !await _installer.VerifySignatureAsync()) return;
 
@@ -335,6 +360,7 @@ public class LanguageServer : IDisposable
 
             if (_port != 0)
             {
+                _readyTcs.TrySetResult(true);
                 ThreadHelper.JoinableTaskFactory.RunAsync(Controller.ConnectAsync)
                     .FireAndForget(true);
             }
@@ -364,6 +390,28 @@ public class LanguageServer : IDisposable
         await _package.UpdateSignedInStateAsync();
     }
 
+    public async Task StopAsync()
+    {
+        await _package.LogAsync("Stopping language server");
+
+        try
+        {
+            if (_process != null && !_process.HasExited)
+            {
+                _process.Kill();
+                _process.Dispose();
+                _process = null;
+            }
+        }
+        catch (Exception ex)
+        {
+             await _package.LogAsync($"StopAsync failed: {ex}");
+        }
+
+        _port = 0;
+        Controller.Disconnect();
+    }
+
     private void LSP_OnExited(object sender, EventArgs e)
     {
         _package.Log("Language Server Process exited unexpectedly, restarting...");
@@ -387,6 +435,7 @@ public class LanguageServer : IDisposable
             if (int.TryParse(match.Groups[2].Value, out _port))
             {
                 _package.Log($"Language server started on port {_port}");
+                _readyTcs.TrySetResult(true);
 
                 ChatToolWindow.Instance?.Reload();
                 ThreadHelper.JoinableTaskFactory.RunAsync(Controller.ConnectAsync)
@@ -445,6 +494,16 @@ public class LanguageServer : IDisposable
         string url =
             $"http://127.0.0.1:{_port}/neo.language_server_pb.LanguageServerService/{command}";
         return await RequestUrlAsync<T>(url, data, cancellationToken);
+    }
+
+    public async Task<HandshakeResponse?> HandshakeAsync(string userId = "")
+    {
+        HandshakeRequest data = new() {
+            metadata = GetMetadata(),
+            user_id = userId
+        };
+
+        return await RequestCommandAsync<HandshakeResponse>("Handshake", data);
     }
 
     public async Task<IList<CompletionItem>?>

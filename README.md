@@ -1,108 +1,107 @@
 <p align="center">
-  <img width="300" alt="Neopilot" src="neopilot.png"/>
+  <img src="banner.png" alt="Neopilot Banner" width="800">
+</p>
+
+# 🚀 Neopilot for Visual Studio
+
+**The Modern Coding Superpower.** Accelerate your development with state-of-the-art AI technology. Neopilot brings the power of advanced large language models directly into your Visual Studio environment, offering lightning-fast completions, intelligent chat, and seamless code analysis in over 70+ languages.
+
+---
+
+<p align="center">
+  <a href="https://discord.gg/3XFf78nAx5"><img src="https://img.shields.io/discord/1027685395649015980?label=community&color=5865F2&logo=discord&logoColor=FFFFFF" alt="Discord"></a>
+  <a href="https://twitter.com/intent/follow?screen_name=neopilot_ai"><img src="https://img.shields.io/badge/style--blue?style=social&logo=twitter&label=Follow%20%40neopilot_ai" alt="Twitter Follow"></a>
+  <img src="https://img.shields.io/github/license/Neopilot-ai/NeopilotVisualStudio" alt="License">
+  <a href="https://neopilot-ai.github.io"><img src="https://img.shields.io/badge/Neopilot%20Docs-09B6A2" alt="Docs"></a>
+  <a href="https://neopilot.canny.io/"><img src="https://img.shields.io/badge/Feature%20Requests-6b69ff" alt="Feature Requests"></a>
+</p>
+
+
+<p align="center">
+  <b>Available on:</b><br>
+  <a href="https://marketplace.visualstudio.com/items?itemName=Neopilot.NeopilotVS">Visual Studio</a> • 
+  <a href="https://marketplace.visualstudio.com/items?itemName=Neopilot.neopilot">VS Code</a> • 
+  <a href="https://plugins.jetbrains.com/plugin/20540-neopilot/">JetBrains</a> • 
+  <a href="https://open-vsx.org/extension/Neopilot/neopilot">Open VSX</a> • 
+  <a href="https://chrome.google.com/webstore/detail/neopilot/hobjkcpmjhlegmobgonaagepfckjkceh">Chrome</a>
 </p>
 
 ---
 
-[![Discord](https://img.shields.io/discord/1027685395649015980?label=community&color=5865F2&logo=discord&logoColor=FFFFFF)](https://discord.gg/3XFf78nAx5)
-[![Twitter Follow](https://img.shields.io/badge/style--blue?style=social&logo=twitter&label=Follow%20%40neopilot_ai)](https://twitter.com/intent/follow?screen_name=neopilot_ai)
-![License](https://img.shields.io/github/license/Neopilot-ai/NeopilotVisualStudio)
-[![Docs](https://img.shields.io/badge/Neopilot%20Docs-09B6A2)](https://neopilot-ai.github.io)
-[![Canny Board](https://img.shields.io/badge/Feature%20Requests-6b69ff)](https://neopilot.canny.io/)
-[![built with Neopilot](https://neopilot-ai.github.io/badges/main)](https://neopilot-ai.github.io?repo_name=neopilot-ai%2FNeopilotVisualStudio)
+## ✨ Why Neopilot?
 
-[![Visual Studio](https://img.shields.io/visual-studio-marketplace/d/Neopilot.NeopilotVS?logo=visualstudio&label=Visual%20Studio)](https://marketplace.visualstudio.com/items?itemName=Neopilot.NeopilotVS)
-[![Visual Studio Code](https://img.shields.io/visual-studio-marketplace/d/Neopilot.neopilot?logo=visualstudiocode&label=Visual%20Studio%20Code)](https://marketplace.visualstudio.com/items?itemName=Neopilot.neopilot)
-[![JetBrains](https://img.shields.io/jetbrains/plugin/d/20540?label=JetBrains)](https://plugins.jetbrains.com/plugin/20540-neopilot/)
-[![Open VSX](https://img.shields.io/open-vsx/dt/Neopilot/neopilot?label=Open%20VSX)](https://open-vsx.org/extension/Neopilot/neopilot)
-[![Google Chrome](https://img.shields.io/chrome-web-store/users/hobjkcpmjhlegmobgonaagepfckjkceh?label=Google%20Chrome&logo=googlechrome&logoColor=FFFFFF)](https://chrome.google.com/webstore/detail/neopilot/hobjkcpmjhlegmobgonaagepfckjkceh)
+Neopilot is designed to eliminate the tedious parts of coding, allowing you to focus on logic and creativity. Whether you're building a new project or maintaining a complex legacy codebase, Neopilot is your perfect copilot.
 
-# Neopilot for Visual Studio
+- **⚡ Blazing Fast Completions**: Get instant multi-line suggestions as you type.
+- **💬 Integrated AI Chat**: No more context switching. Chat with your code directly in the IDE.
+- **🧠 70+ Languages Supported**: From C# and Java to Rust, Go, and Python.
+- **🛠️ Smart Refactoring**: Instantly rewrite, optimize, or explain complex blocks of code.
+- **🆓 Completely Free**: Unlimited completions and chat, forever.
 
-[Neopilot](https://neopilot-ai.github.io/) is the modern coding superpower, a free code acceleration toolkit built on cutting edge AI technology. Currently, Neopilot provides autocomplete, chat, and search capabilities in 70+ languages, with lightning fast speeds and state-of-the-art suggestion quality.
+---
 
-There are many parts of the modern coding workflow that are boring, tedious, or frustrating, from regurgitating boilerplate to poring through StackOverflow. Recent advances in AI allow us to eliminate these parts, making it seamless to turn your ideas into code. With easy integration into Visual Studio and a less than 2 minute installation process, you can focus on being the best software developer, not the best code monkey.
+## 🏎️ Autocomplete Superpowers
 
-With Neopilot, you get:
-- Unlimited single and multi-line code completions forever.
-- IDE-integrated chat: no need to leave Visual Studio to ChatGPT, and use convenient suggestions such as [Refactor](#refactor) and [Explain](#explain).
-- Support for 70+ programming languages: Javascript, Python, Typescript, PHP, Go, Java, C, C++, Rust, Ruby, and more.
-- Support through our [Discord Community](https://discord.gg/3XFf78nAx5).
-
-Join thousands of other developers who are using Neopilot for free to accelerate their software iteration process, improve their code quality and consistency, reduce the number of code review iterations, accelerate developer onboarding, and keep them in their flow state. Want to learn more? Check out our [FAQ](https://neopilot-ai.github.io/faq).
-
-Check out our [playground](https://neopilot-ai.github.io/playground) if you want to quickly try out Neopilot online.
-
-# Your New Autocomplete Superpowers
-## Use Natural Language
-
-Need to make changes in an unfamiliar language or codebase? Instead of spending hours learning all of the syntactical and stylistic details, type out comments in natural language and let Neopilot get the job done.
+### 📝 Natural Language to Code
+Describe what you want in plain English, and watch Neopilot generate the implementation perfectly aligned with your project's style.
 
 <p align="center">
-  <image src="docs/images/gen_random.gif" width="500"/>
+  <img src="docs/images/gen_random.gif" width="600" alt="Natural Language to Code">
 </p>
 
-## Minimize Boilerplate Coding
-
-Sometimes feel like a code monkey copy-pasting and modifying boilerplate code over and over again? Let Neopilot handle writing the repetitive work so that you can stay in the coding flow state, generating code faster than you can type.
+### 🛠️ Drastically Reduce Boilerplate
+Stop wasting time on repetitive patterns. Neopilot predicts your next moves and handles the boilerplate so you can stay in the flow.
 
 <p align="center">
-  <image src="docs/images/auto_complete.gif" width="500"/>
+  <img src="docs/images/auto_complete.gif" width="600" alt="Boilerplate Completion">
 </p>
 
-# Your New Chat Superpowers
-## Generate
+---
 
-Neopilot Chat can generate whole functions and applications for you with simple natural language prompting and constraints.
+## 💬 Chat & Analysis Superpowers
+
+Neopilot's integrated chat isn't just a sidecar—it's deeply integrated into your editor.
+
+| Feature | Description | Visual |
+| :--- | :--- | :--- |
+| **Generate** | Build entire functions or components from simple prompts. | <img src="docs/images/chat_generate_function.gif" width="300"> |
+| **Explain** | Understand complex logic or unfamiliar APIs instantly. | <img src="docs/images/chat_explain.gif" width="300"> |
+| **Refactor** | Improve code quality, fix bugs, or modernize syntax with one click. | <img src="docs/images/chat_refactor.gif" width="300"> |
+| **Translate** | Port logic between languages (e.g., Python to C#) in seconds. | <img src="docs/images/chat_convert.gif" width="300"> |
+| **Debug** | Get clear, concise explanations for compiler errors and warnings. | <img src="docs/images/chat_explain_problem.gif" width="300"> |
+
+---
+
+## 🛠️ Build from Source
+
+If you want to contribute to the extension or build it yourself:
+
+1.  **Prerequisites**:
+    - [Visual Studio 2022](https://visualstudio.microsoft.com/) with **Visual Studio extension development** workload.
+    - [Extensibility Essentials 2022](https://marketplace.visualstudio.com/items?itemName=MadsKristensen.ExtensibilityEssentials2022).
+2.  **Steps**:
+    - Open `NeopilotVS.sln`.
+    - Build the solution (<kbd>Ctrl</kbd> + <kbd>Shift</kbd> + <kbd>B</kbd>).
+    - The compiled `.vsix` will be in `NeopilotVS/bin/Debug` (or `Release`).
+    - Press <kbd>F5</kbd> to launch an Experimental Instance of Visual Studio with the extension loaded.
+
+---
+
+## ❤️ Community & Feedback
+
+We'd love to hear from you!
+*   **Discord**: Join our [Developer Community](https://discord.gg/3XFf78nAx5) for support and discussion.
+*   **Issues**: Found a bug? [Open an issue](https://github.com/Neopilot-ai/NeopilotVisualStudio/issues) on GitHub.
+*   **Features**: Have a great idea? Suggest it on our [Canny board](https://neopilot.canny.io/).
+
+---
+
+## 📄 License
+
+Neopilot for Visual Studio is licensed under the **MIT License**. See [LICENSE.txt](LICENSE.txt) for details.
+
+---
 
 <p align="center">
-  <image src="docs/images/chat_generate_function.gif" width="800"/>
+  Built with ❤️ by the Neopilot Team and Contributors.
 </p>
-
-## Explain
-
-Diving into a foreign codebase? With the push of a button, our assistant will explain everything you need to know.
-
-<p align="center">
-  <image src="docs/images/chat_explain.gif" width="800"/>
-</p>
-
-## Refactor
-
-Want to rewrite your existing code to add a new feature? Fix a bug? Make it prettier? Click a button and tell your Neopilot assistant what you want.
-
-<p align="center">
-  <image src="docs/images/chat_refactor.gif" width="800"/>
-</p>
-
-## Translate
-
-Leverage the power of AI to translate whole functions from one language to another within seconds.
-
-<p align="center">
-  <image src="docs/images/chat_convert.gif" width="800"/>
-</p>
-
-## Explain Problem
-
-Ever feels like warnings and errors are too verbose? Neopilot can explain like you're five!
-<p align="center">
-  <image src="docs/images/chat_explain_problem.gif" width="800"/>
-</p>
-
-# Build Instructions
-- Open Visual Studio Installer and click the Modify button. Install the "Visual Studio extension development" in Other Toolsets.
-- Install the [Extensibility Essentials 2022](https://marketplace.visualstudio.com/items?itemName=MadsKristensen.ExtensibilityEssentials2022) extension.
-- Open `NeopilotVS.sln` and press <kbd>CTRL+B</kbd> to build, if there were no errors, there should be a `Neopilot.vsix` file in the `NeopilotVS/bin` folder.
-- You can press <kbd>F5</kbd> to debug the extension on a separate instance of Visual Studio. Consult the [official guide](https://learn.microsoft.com/en-us/visualstudio/extensibility/starting-to-develop-visual-studio-extensions?view=vs-2022) for more information.
-
-# How to help
-Feel free to [submit issues](https://github.com/Neopilot-ai/NeopilotVisualStudio/issues/new) related to the extension so that we can better improve your experiences.
-
-We greatly value your input and invite you to contribute to our project. To do so, kindly [initiate a pull request](https://github.com/Neopilot-ai/NeopilotVisualStudio/compare). Your expertise and insights are much appreciated.
-
-# Documentation
-For more information on how to install and use the extension, please see [the documentation](/docs/).
-
-# License
-The Neopilot Plugin for Visual Studio is licensed under the MIT License, see [LICENSE.txt](/LICENSE.txt) for more information.

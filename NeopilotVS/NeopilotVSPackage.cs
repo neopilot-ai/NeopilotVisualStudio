@@ -95,7 +95,7 @@ public sealed class NeopilotVSPackage : ToolkitPackage
         }
 
         await LanguageServer.InitializeAsync();
-        await LogAsync("Neopilot Extension for Visual Studio");
+        await LogAsync($"Neopilot Extension for Visual Studio v{Vsix.Version}");
     }
 
     protected override void Dispose(bool disposing)

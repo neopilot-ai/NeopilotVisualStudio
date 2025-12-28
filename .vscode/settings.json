@@ -1,0 +1,10 @@
+{
+    "dotnet.preferCSharpExtension": true,
+    "editor.formatOnSave": true,
+    "editor.codeActionsOnSave": {
+        "source.fixAll": "explicit",
+        "source.organizeImports": "explicit"
+    },
+    "csharp.formatOnType": true,
+    "csharp.suppressDotnetRestoreNotification": true
+}
