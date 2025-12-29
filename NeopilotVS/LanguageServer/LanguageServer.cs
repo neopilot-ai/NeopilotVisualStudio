@@ -3,7 +3,7 @@ using Community.VisualStudio.Toolkit;
 using Microsoft.VisualStudio.Imaging;
 using Microsoft.VisualStudio.Shell.Interop;
 using Microsoft.VisualStudio.Threading;
-using Newtonsoft.Json;
+using System.Text.Json;
 using System.Collections.Generic;
 using System.Diagnostics;
 using System.Globalization;
@@ -565,13 +565,13 @@ public class LanguageServer : IDisposable
                                                CancellationToken cancellationToken = default)
     {
         StringContent post_data =
-            new(JsonConvert.SerializeObject(data), Encoding.UTF8, "application/json");
+            new(JsonSerializer.Serialize(data), Encoding.UTF8, "application/json");
         try
         {
             HttpResponseMessage rq = await _httpClient.PostAsync(url, post_data, cancellationToken);
             if (rq.StatusCode == HttpStatusCode.OK)
             {
-                return JsonConvert.DeserializeObject<T>(await rq.Content.ReadAsStringAsync());
+                return JsonSerializer.Deserialize<T>(await rq.Content.ReadAsStringAsync());
             }
 
             if (rq.StatusCode == HttpStatusCode.Forbidden ||
@@ -600,7 +600,7 @@ public class LanguageServer : IDisposable
     private async Task<T?> RequestCommandAsync<T>(string command, object data,
                                                    CancellationToken cancellationToken = default)
     {
-        string url = string.Format(Constants.LanguageServerCommandUrl, _port, command);
+        string url = $"http://127.0.0.1:{_port}/neo.language_server_pb.LanguageServerService/{command}";
         return await RequestUrlAsync<T>(url, data, cancellationToken);
     }
 

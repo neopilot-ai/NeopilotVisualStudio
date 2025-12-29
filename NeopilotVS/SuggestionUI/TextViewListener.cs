@@ -51,7 +51,7 @@ internal class NeopilotCompletionHandler : IOleCommandTarget, IDisposable
     [DllImport("user32.dll", CharSet = CharSet.Auto, ExactSpelling = true)]
     public static extern short GetAsyncKeyState(Int32 keyCode);
 
-    public async void GetCompletion()
+    public async Task GetCompletionAsync()
     {
         try
         {
@@ -357,7 +357,7 @@ internal class NeopilotCompletionHandler : IOleCommandTarget, IDisposable
         }
     }
 
-    public async void ShowNextSuggestion()
+    public async Task ShowNextSuggestionAsync()
     {
         try
         {
@@ -555,11 +555,11 @@ internal class NeopilotCompletionHandler : IOleCommandTarget, IDisposable
         if (!typedChar.Equals(char.MinValue) ||
             commandID == (uint)VSConstants.VSStd2KCmdID.RETURN || regenerateSuggestion)
         {
-            _ = Task.Run(() =>
+            _ = Task.Run(async () =>
                          {
                              try
                              {
-                                 GetCompletion();
+                                 await GetCompletionAsync();
                              }
                              catch (Exception e)
                              {
@@ -573,11 +573,11 @@ internal class NeopilotCompletionHandler : IOleCommandTarget, IDisposable
         {
             ClearSuggestion();
 
-            _ = Task.Run(() =>
+            _ = Task.Run(async () =>
                          {
                              try
                              {
-                                 GetCompletion();
+                                 await GetCompletionAsync();
                              }
                              catch (Exception e)
                              {
