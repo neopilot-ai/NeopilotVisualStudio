@@ -19,8 +19,30 @@ using NeopilotVS.Utilities;
 
 namespace NeopilotVS;
 
+/// <summary>
+/// Manages the language server process and communication.
+/// </summary>
 public class LanguageServer : IDisposable
 {
+    private static class Constants
+    {
+        public const string RegisterUserUrl = "https://api.neopilot.com/register_user/";
+        public const string EnterpriseRegisterUserUrl = "/neo.seat_management_pb.SeatManagementService/RegisterUser";
+        public const string PortalUrl = "https://neopilot-ai.github.io";
+        public const string LanguageServerCommandUrl = "http://127.0.0.1:{0}/neo.language_server_pb.LanguageServerService/{1}";
+
+        public const string UpdateUserSettingsCommand = "UpdateUserSettings";
+        public const string RecordChatFeedbackCommand = "RecordChatFeedback";
+        public const string GetAuthTokenCommand = "GetAuthToken";
+        public const string HandshakeCommand = "Handshake";
+        public const string GetCompletionsCommand = "GetCompletions";
+        public const string AcceptCompletionCommand = "AcceptCompletion";
+        public const string GetProcessesCommand = "GetProcesses";
+        public const string AddTrackedWorkspaceCommand = "AddTrackedWorkspace";
+        public const string GetFunctionsCommand = "GetFunctions";
+        public const string GetClassInfosCommand = "GetClassInfos";
+    }
+
     private string _languageServerURL;
 
     private int _port = 0;
@@ -35,6 +57,9 @@ public class LanguageServer : IDisposable
     private readonly LanguageServerInstaller _installer;
     private readonly WorkspaceIndexer _indexer;
 
+    /// <summary>
+    /// Initializes a new instance of the <see cref="LanguageServer"/> class.
+    /// </summary>
     public LanguageServer()
     {
         _package = NeopilotVSPackage.Instance;
@@ -45,6 +70,9 @@ public class LanguageServer : IDisposable
         _indexer = new WorkspaceIndexer(_package, this);
     }
 
+    /// <summary>
+    /// Initializes the language server.
+    /// </summary>
     public async Task InitializeAsync()
     {
         await ThreadHelper.JoinableTaskFactory.SwitchToMainThreadAsync();
@@ -77,6 +105,9 @@ public class LanguageServer : IDisposable
         _metadata.disable_telemetry = false;
     }
 
+    /// <summary>
+    /// Disposes the language server.
+    /// </summary>
     public void Dispose()
     {
         try
@@ -97,23 +128,44 @@ public class LanguageServer : IDisposable
         _httpClient.Dispose();
     }
 
+    /// <summary>
+    /// Gets the port of the language server.
+    /// </summary>
     public int GetPort() { return _port; }
+
+    /// <summary>
+    /// Gets the API key.
+    /// </summary>
     public string GetKey() { return _metadata.api_key; }
+
+    /// <summary>
+    /// Gets the version of the language server.
+    /// </summary>
     public string GetVersion() { return _installer.Version; }
+
+    /// <summary>
+    /// Gets a value indicating whether the language server is ready.
+    /// </summary>
     public bool IsReady() { return _port != 0; }
+
+    /// <summary>
+    /// Waits for the language server to be ready.
+    /// </summary>
     public async Task WaitReadyAsync()
     {
         if (IsReady()) return;
         await _readyTcs.Task;
     }
 
-    // Get API key from the authentication token
+    /// <summary>
+    /// Signs in the user with an authentication token.
+    /// </summary>
+    /// <param name="authToken">The authentication token.</param>
     public async Task SignInWithAuthTokenAsync(string authToken)
     {
         string url = _package.SettingsPage.EnterpriseMode
-                         ? _package.SettingsPage.ApiUrl +
-                                "/neo.seat_management_pb.SeatManagementService/RegisterUser"
-                         : "https://api.neopilot.com/register_user/";
+                         ? _package.SettingsPage.ApiUrl + Constants.EnterpriseRegisterUserUrl
+                         : Constants.RegisterUserUrl;
 
         RegisterUserRequest data = new() { firebase_id_token = authToken };
         RegisterUserResponse result = await RequestUrlAsync<RegisterUserResponse>(url, data);
@@ -143,7 +195,10 @@ public class LanguageServer : IDisposable
         await _package.UpdateSignedInStateAsync();
     }
 
-    // Update user settings on the language server
+    /// <summary>
+    /// Updates the user settings on the language server.
+    /// </summary>
+    /// <param name="openMostRecentChat">A value indicating whether to open the most recent chat conversation.</param>
     public async Task UpdateUserSettingsAsync(bool openMostRecentChat)
     {
         UpdateUserSettingsRequest data = new() {
@@ -152,10 +207,15 @@ public class LanguageServer : IDisposable
             }
         };
 
-        await RequestCommandAsync<UpdateUserSettingsResponse>("UpdateUserSettings", data);
+        await RequestCommandAsync<UpdateUserSettingsResponse>(Constants.UpdateUserSettingsCommand, data);
     }
 
-    // Record feedback for a chat message
+    /// <summary>
+    /// Records feedback for a chat message.
+    /// </summary>
+    /// <param name="messageId">The ID of the message.</param>
+    /// <param name="feedback">The feedback type.</param>
+    /// <param name="reason">The reason for the feedback.</param>
     public async Task RecordChatFeedbackAsync(string messageId, ChatFeedbackType feedback, string reason = "")
     {
         RecordChatFeedbackRequest data = new() {
@@ -165,10 +225,12 @@ public class LanguageServer : IDisposable
             reason = reason
         };
 
-        await RequestCommandAsync<RecordChatFeedbackResponse>("RecordChatFeedback", data);
+        await RequestCommandAsync<RecordChatFeedbackResponse>(Constants.RecordChatFeedbackCommand, data);
     }
 
-    // Open the browser to sign in
+    /// <summary>
+    /// Opens the browser to sign in.
+    /// </summary>
     public async Task SignInAsync()
     {
         // this will block until the sign in process has finished
@@ -178,7 +240,7 @@ public class LanguageServer : IDisposable
             await WaitReadyAsync();
 
             GetAuthTokenResponse? result =
-                await RequestCommandAsync<GetAuthTokenResponse>("GetAuthToken", new {});
+                await RequestCommandAsync<GetAuthTokenResponse>(Constants.GetAuthTokenCommand, new {});
 
             if (result == null)
             {
@@ -201,7 +263,7 @@ public class LanguageServer : IDisposable
 
         string state = Guid.NewGuid().ToString();
         string portalUrl = _package.SettingsPage.EnterpriseMode ? _package.SettingsPage.PortalUrl
-                                                                : "https://neopilot-ai.github.io";
+                                                                : Constants.PortalUrl;
         string redirectUrl = Uri.EscapeDataString($"http://127.0.0.1:{_port}/auth");
         string url =
             $"{portalUrl}/profile?response_type=token&redirect_uri={redirectUrl}&state={state}&scope=openid%20profile%20email&redirect_parameters_type=query";
@@ -214,7 +276,9 @@ public class LanguageServer : IDisposable
         if (authToken != null) await SignInWithAuthTokenAsync(authToken);
     }
 
-    // Delete the stored API key
+    /// <summary>
+    /// Signs out the user.
+    /// </summary>
     public async Task SignOutAsync()
     {
         _metadata.api_key = "";
@@ -223,11 +287,71 @@ public class LanguageServer : IDisposable
         await _package.UpdateSignedInStateAsync();
     }
 
+        /// <summary>
+    /// Called when the language server installation is completed.
+    /// </summary>
     public async Task OnInstallationCompleted()
-    {
-        await StartAsync();
-    }
 
+        {
+
+            await StartAsync();
+
+        }
+
+    
+
+        private string BuildArguments()
+
+        {
+
+            string apiUrl = (_package.SettingsPage.ApiUrl.Equals("") ? "https://server.neopilot.com"
+
+                                                                     : _package.SettingsPage.ApiUrl);
+
+            string managerDir = Path.Combine(Path.GetTempPath(), Path.GetRandomFileName());
+
+            string databaseDir = _package.GetDatabaseDirectory();
+
+    
+
+            var arguments = new StringBuilder();
+
+            arguments.Append($"--api_server_url {apiUrl} --manager_dir \"{managerDir}\" --database_dir \"{databaseDir}\"");
+
+            arguments.Append($" --enable_chat_web_server --enable_chat_client --detect_proxy={_package.SettingsPage.EnableLanguageServerProxy}");
+
+    
+
+            if (_package.SettingsPage.EnableIndexing)
+
+            {
+
+                arguments.Append($" --enable_local_search --enable_index_service --search_max_workspace_file_count {_package.SettingsPage.IndexingMaxWorkspaceSize}");
+
+            }
+
+    
+
+            if (_package.SettingsPage.EnterpriseMode)
+
+            {
+
+                arguments.Append($" --enterprise_mode --portal_url {_package.SettingsPage.PortalUrl}");
+
+            }
+
+    
+
+            return arguments.ToString();
+
+        }
+
+    
+
+        /// <summary>
+    /// Starts the language server.
+    /// </summary>
+    /// <param name="ignoreDigitalSignature">A value indicating whether to ignore the digital signature check.</param>
     public async Task StartAsync(bool ignoreDigitalSignature = true)
     {
         _port = 0;
@@ -235,50 +359,16 @@ public class LanguageServer : IDisposable
 
         if (!ignoreDigitalSignature && !await _installer.VerifySignatureAsync()) return;
 
-        string apiUrl = (_package.SettingsPage.ApiUrl.Equals("") ? "https://server.neopilot.com"
-                                                                 : _package.SettingsPage.ApiUrl);
-        string managerDir = Path.Combine(Path.GetTempPath(), Path.GetRandomFileName());
-        string databaseDir = _package.GetDatabaseDirectory();
-        string languageServerPath = _package.GetLanguageServerPath();
-
-        try
-        {
-            Directory.CreateDirectory(managerDir);
-            Directory.CreateDirectory(databaseDir);
-        }
-        catch (Exception ex)
-        {
-            await _package.LogAsync(
-                $"LanguageServer.StartAsync: Failed to create directories; Exception: {ex}");
-
-            new NotificationInfoBar().Show(
-                "[Neopilot] Critical error: Failed to create language server directories. Please " +
-                    "check the output window for more details.",
-                KnownMonikers.StatusError,
-                true,
-                null,
-                NotificationInfoBar.SupportActions);
-            return;
-        }
+        if (!CreateLanguageServerDirectories()) return;
 
         _process = new();
-        _process.StartInfo.FileName = languageServerPath;
+        _process.StartInfo.FileName = _package.GetLanguageServerPath();
         _process.StartInfo.UseShellExecute = false;
         _process.StartInfo.CreateNoWindow = true;
         _process.StartInfo.RedirectStandardError = true;
         _process.EnableRaisingEvents = true;
 
-        _process.StartInfo.Arguments =
-            $"--api_server_url {apiUrl} --manager_dir \"{managerDir}\" --database_dir \"{databaseDir}\"" +
-            $" --enable_chat_web_server --enable_chat_client --detect_proxy={_package.SettingsPage.EnableLanguageServerProxy}";
-
-        if (_package.SettingsPage.EnableIndexing)
-            _process.StartInfo.Arguments +=
-                $" --enable_local_search --enable_index_service --search_max_workspace_file_count {_package.SettingsPage.IndexingMaxWorkspaceSize}";
-
-        if (_package.SettingsPage.EnterpriseMode)
-            _process.StartInfo.Arguments +=
-                $" --enterprise_mode --portal_url {_package.SettingsPage.PortalUrl}";
+        _process.StartInfo.Arguments = BuildArguments();
 
         _process.ErrorDataReceived += LSP_OnPipeDataReceived;
         _process.OutputDataReceived += LSP_OnPipeDataReceived;
@@ -286,98 +376,8 @@ public class LanguageServer : IDisposable
 
         await _package.LogAsync("Starting language server");
 
-        try
-        {
-            _process.Start();
-        }
-        catch (Exception ex)
-        {
-            _process = null;
-            await _package.LogAsync(
-                $"LanguageServer.StartAsync: Failed to start the language server; Exception: {ex}");
-
-            NotificationInfoBar errorBar = new();
-            KeyValuePair<string, Action>[] actions = [
-                new KeyValuePair<string, Action>("Retry",
-                                                 delegate {
-                                                     _process = null;
-                                                     Utilities.FileUtilities.DeleteSafe(
-                                                         languageServerPath);
-
-                                                     ThreadHelper.JoinableTaskFactory
-                                                         .RunAsync(async delegate {
-                                                              await errorBar.CloseAsync();
-                                                              await _installer.PrepareAsync();
-                                                          })
-                                                         .FireAndForget();
-                                                 }),
-            ];
-
-            await ThreadHelper.JoinableTaskFactory.SwitchToMainThreadAsync();
-            errorBar.Show("[Neopilot] Critical Error: Failed to start the language server. Do " +
-                               "you want to retry?",
-                          KnownMonikers.StatusError,
-                          true,
-                          null,
-                          [..actions, ..NotificationInfoBar.SupportActions]);
-
-            return;
-        }
-
-        try
-        {
-            _process.BeginErrorReadLine();
-        }
-        catch (Exception ex)
-        {
-            await _package.LogAsync(
-                $"LanguageServer.StartAsync: BeginErrorReadLine failed; Exception: {ex}");
-
-            await ThreadHelper.JoinableTaskFactory.SwitchToMainThreadAsync();
-            new NotificationInfoBar().Show("[Neopilot] Failed to read output from the language " +
-                                               "server, Neopilot might not work properly.",
-                                           KnownMonikers.IntellisenseWarning,
-                                           true,
-                                           null,
-                                           NotificationInfoBar.SupportActions);
-
-            var timeoutSec = 120;
-            var elapsedSec = 0;
-
-            while (elapsedSec++ < timeoutSec)
-            {
-                var files = Directory.GetFiles(managerDir);
-
-                foreach (var file in files)
-                {
-                    if (int.TryParse(Path.GetFileName(file), out _port) && _port != 0) break;
-                }
-
-                if (_port != 0) break;
-
-                await Task.Delay(1000);
-            }
-
-            if (_port != 0)
-            {
-                _readyTcs.TrySetResult(true);
-                ThreadHelper.JoinableTaskFactory.RunAsync(Controller.ConnectAsync)
-                    .FireAndForget(true);
-            }
-            else
-            {
-                new NotificationInfoBar().Show(
-                    "[Neopilot] Critical Error: Failed to get the language server port. Please " +
-                        "check the output window for more details.",
-                    KnownMonikers.StatusError,
-                    true,
-                    null,
-                    NotificationInfoBar.SupportActions);
-
-                return;
-            }
-        }
-
+        StartLanguageServerProcess();
+		
         if (!Utilities.ProcessExtensions.MakeProcessExitOnParentExit(_process))
         {
             await _package.LogAsync(
@@ -390,6 +390,124 @@ public class LanguageServer : IDisposable
         await _package.UpdateSignedInStateAsync();
     }
 
+    private bool CreateLanguageServerDirectories()
+    {
+        string managerDir = Path.Combine(Path.GetTempPath(), Path.GetRandomFileName());
+        string databaseDir = _package.GetDatabaseDirectory();
+        try
+        {
+            Directory.CreateDirectory(managerDir);
+            Directory.CreateDirectory(databaseDir);
+            return true;
+        }
+        catch (Exception ex)
+        {
+            _package.LogAsync(
+                $"LanguageServer.StartAsync: Failed to create directories; Exception: {ex}");
+
+            new NotificationInfoBar().Show(
+                "[Neopilot] Critical error: Failed to create language server directories. Please " +
+                    "check the output window for more details.",
+                KnownMonikers.StatusError,
+                true,
+                null,
+                NotificationInfoBar.SupportActions);
+            return false;
+        }
+    }
+
+
+        private void StartLanguageServerProcess()
+        {
+            try
+            {
+                _process.Start();
+                _process.BeginErrorReadLine();
+            }
+            catch (Exception ex)
+            {
+                HandleProcessStartFailure(ex);
+                return;
+            }
+    
+            GetPortFromManagerDir(Path.GetDirectoryName(_process.StartInfo.Arguments
+                .Split(new[] { "--manager_dir " }, StringSplitOptions.None)[1]
+                .Trim('"'))).FireAndForget();
+        }        
+            private async Task GetPortFromManagerDir(string managerDir)
+    {
+        var timeoutSec = 120;
+        var elapsedSec = 0;
+
+        while (elapsedSec++ < timeoutSec)
+        {
+            var files = Directory.GetFiles(managerDir);
+
+            foreach (var file in files)
+            {
+                if (int.TryParse(Path.GetFileName(file), out _port) && _port != 0) break;
+            }
+
+            if (_port != 0) break;
+
+            await Task.Delay(1000);
+        }
+
+        if (_port != 0)
+        {
+            _readyTcs.TrySetResult(true);
+            ThreadHelper.JoinableTaskFactory.RunAsync(Controller.ConnectAsync)
+                .FireAndForget(true);
+        }
+        else
+        {
+            new NotificationInfoBar().Show(
+                "[Neopilot] Critical Error: Failed to get the language server port. Please " +
+                    "check the output window for more details.",
+                KnownMonikers.StatusError,
+                true,
+                null,
+                NotificationInfoBar.SupportActions);
+        }
+    }
+	
+    private void HandleProcessStartFailure(Exception ex)
+            {
+                _process = null;
+                _package.LogAsync(
+                    $"LanguageServer.StartAsync: Failed to start the language server; Exception: {ex}");
+        
+                NotificationInfoBar errorBar = new();
+                KeyValuePair<string, Action>[] actions = [
+                    new KeyValuePair<string, Action>("Retry",
+                                                        delegate {
+                                                            _process = null;
+                                                            Utilities.FileUtilities.DeleteSafe(
+                                                                _package.GetLanguageServerPath());
+        
+                                                            ThreadHelper.JoinableTaskFactory
+                                                                .RunAsync(async delegate {
+                                                                    await errorBar.CloseAsync();
+                                                                    await _installer.PrepareAsync();
+                                                                })
+                                                                .FireAndForget();
+                                                        }),
+                ];
+        
+                ThreadHelper.JoinableTaskFactory.Run(async delegate {
+                    await ThreadHelper.JoinableTaskFactory.SwitchToMainThreadAsync();
+                    errorBar.Show("[Neopilot] Critical Error: Failed to start the language server. Do " +
+                                        "you want to retry?",
+                                    KnownMonikers.StatusError,
+                                    true,
+                                    null,
+                                    [.. actions, .. NotificationInfoBar.SupportActions]);
+                });
+            }
+        
+            /// <summary>
+    /// Stops the language server.
+    /// </summary>
     public async Task StopAsync()
     {
         await _package.LogAsync("Stopping language server");
@@ -428,24 +546,16 @@ public class LanguageServer : IDisposable
         if (string.IsNullOrEmpty(e.Data)) return;
 
         Match match =
-            Regex.Match(e.Data, @"Language server listening on (random|fixed) port at (\d{2,5})");
+            Regex.Match(e.Data, @"(?<=port at )(\d{2,5})");
 
-        if (match.Success)
+        if (match.Success && int.TryParse(match.Value, out _port))
         {
-            if (int.TryParse(match.Groups[2].Value, out _port))
-            {
-                _package.Log($"Language server started on port {_port}");
-                _readyTcs.TrySetResult(true);
+            _package.Log($"Language server started on port {_port}");
+            _readyTcs.TrySetResult(true);
 
-                ChatToolWindow.Instance?.Reload();
-                ThreadHelper.JoinableTaskFactory.RunAsync(Controller.ConnectAsync)
-                    .FireAndForget(true);
-            }
-            else
-            {
-                _package.Log(
-                    $"Error: Failed to parse the port number from \"{match.Groups[1].Value}\"");
-            }
+            ChatToolWindow.Instance?.Reload();
+            ThreadHelper.JoinableTaskFactory.RunAsync(Controller.ConnectAsync)
+                .FireAndForget(true);
         }
 
         _package.Log("Language Server: " + e.Data);
@@ -469,12 +579,11 @@ public class LanguageServer : IDisposable
             {
                 await _package.LogAsync("Session expired - please sign in again");
                 await SignOutAsync();
+                return default;
             }
-            else
-            {
-                await _package.LogAsync(
-                    $"Error: Failed to send request to {url}, status code: {rq.StatusCode}");
-            }
+
+            await _package.LogAsync(
+                $"Error: Failed to send request to {url}, status code: {rq.StatusCode}");
         }
         catch (OperationCanceledException)
         {
@@ -491,8 +600,7 @@ public class LanguageServer : IDisposable
     private async Task<T?> RequestCommandAsync<T>(string command, object data,
                                                    CancellationToken cancellationToken = default)
     {
-        string url =
-            $"http://127.0.0.1:{_port}/neo.language_server_pb.LanguageServerService/{command}";
+        string url = string.Format(Constants.LanguageServerCommandUrl, _port, command);
         return await RequestUrlAsync<T>(url, data, cancellationToken);
     }
 
@@ -503,7 +611,7 @@ public class LanguageServer : IDisposable
             user_id = userId
         };
 
-        return await RequestCommandAsync<HandshakeResponse>("Handshake", data);
+        return await RequestCommandAsync<HandshakeResponse>(Constants.HandshakeCommand, data);
     }
 
     public async Task<IList<CompletionItem>?>
@@ -532,7 +640,7 @@ public class LanguageServer : IDisposable
                     } };
 
         GetCompletionsResponse? result =
-            await RequestCommandAsync<GetCompletionsResponse>("GetCompletions", data, token);
+            await RequestCommandAsync<GetCompletionsResponse>(Constants.GetCompletionsCommand, data, token);
         return result != null ? result.completionItems : [];
     }
 
@@ -541,18 +649,18 @@ public class LanguageServer : IDisposable
         AcceptCompletionRequest data =
             new() { metadata = GetMetadata(), completion_id = completionId };
 
-        await RequestCommandAsync<AcceptCompletionResponse>("AcceptCompletion", data);
+        await RequestCommandAsync<AcceptCompletionResponse>(Constants.AcceptCompletionCommand, data);
     }
 
     public async Task<GetProcessesResponse?> GetProcessesAsync()
     {
-        return await RequestCommandAsync<GetProcessesResponse>("GetProcesses", new {});
+        return await RequestCommandAsync<GetProcessesResponse>(Constants.GetProcessesCommand, new {});
     }
 
     public async Task<AddTrackedWorkspaceResponse?> AddTrackedWorkspaceAsync(string workspacePath)
     {
         AddTrackedWorkspaceRequest data = new() { workspace = workspacePath };
-        return await RequestCommandAsync<AddTrackedWorkspaceResponse>("AddTrackedWorkspace", data);
+        return await RequestCommandAsync<AddTrackedWorkspaceResponse>(Constants.AddTrackedWorkspaceCommand, data);
     }
 
     public Metadata GetMetadata()
@@ -589,7 +697,7 @@ public class LanguageServer : IDisposable
         };
 
         GetFunctionsResponse? result =
-            await RequestCommandAsync<GetFunctionsResponse>("GetFunctions", data, token);
+            await RequestCommandAsync<GetFunctionsResponse>(Constants.GetFunctionsCommand, data, token);
         return result != null ? result.FunctionCaptures : [];
     }
 
@@ -613,7 +721,7 @@ public class LanguageServer : IDisposable
         };
 
         GetClassInfosResponse? result =
-            await RequestCommandAsync<GetClassInfosResponse>("GetClassInfos", data, token);
+            await RequestCommandAsync<GetClassInfosResponse>(Constants.GetClassInfosCommand, data, token);
         return result != null ? result.ClassCaptures : [];
     }
 }

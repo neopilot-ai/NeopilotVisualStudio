@@ -6,12 +6,8 @@ using Microsoft.VisualStudio;
 using Microsoft.VisualStudio.Imaging;
 using Microsoft.VisualStudio.Shell.Interop;
 using Microsoft.VisualStudio.Threading;
-using Microsoft.Win32;
 using System.Collections.Generic;
 using System.ComponentModel.Design;
-using System.Diagnostics;
-using System.IO;
-using System.Runtime.InteropServices;
 using System.Threading;
 
 namespace NeopilotVS;
@@ -28,10 +24,15 @@ namespace NeopilotVS;
 [ProvideToolWindow(
     typeof(ChatToolWindow), MultiInstances = false, Style = VsDockStyle.Tabbed,
     Orientation = ToolWindowOrientation.Right,
-    Window =
-        "{3AE79031-E1BC-11D0-8F78-00A0C9110057}")] // default docking window, magic string for the
+    // default docking window, magic string for the guid of VSConstants.StandardToolWindows.SolutionExplorer
+        // The GUID is hardcoded because attribute arguments must be compile-time constants.
+        Window = "{3AE79031-E1BC-11D0-8F78-00A0C9110057}")] // default docking window, magic string for the
                                                    // guid of
                                                    // VSConstants.StandardToolWindows.SolutionExplorer
+/// <summary>
+/// This is the main class of the Neopilot Visual Studio extension.
+/// It is responsible for initializing the extension, registering commands, and managing the language server.
+/// </summary>
 public sealed class NeopilotVSPackage : ToolkitPackage
 {
     internal static NeopilotVSPackage? Instance { get; private set; }
@@ -42,6 +43,13 @@ public sealed class NeopilotVSPackage : ToolkitPackage
     public SettingsPage SettingsPage;
     public LanguageServer LanguageServer;
 
+    /// <summary>
+    /// Initialization of the package; this method is called right after the package is sited, so this is the place
+    /// where you can put all the initialization code that rely on services provided by VisualStudio.
+    /// </summary>
+    /// <param name="cancellationToken">A cancellation token to monitor for initialization cancellation, which can occur when VS is shutting down.</param>
+    /// <param name="progress">A provider for progress updates.</param>
+    /// <returns>A task representing the async work of package initialization, or an already completed task if there is none. Do not return null from this method.</returns>
     protected override async Task InitializeAsync(CancellationToken cancellationToken,
                                                   IProgress<ServiceProgressData> progress)
     {
@@ -98,12 +106,18 @@ public sealed class NeopilotVSPackage : ToolkitPackage
         await LogAsync($"Neopilot Extension for Visual Studio v{Vsix.Version}");
     }
 
+    /// <summary>
+    /// Called when the package is being disposed.
+    /// </summary>
     protected override void Dispose(bool disposing)
     {
         LanguageServer.Dispose();
         base.Dispose(disposing);
     }
 
+    /// <summary>
+    /// Ensures that the package is loaded. This is a blocking call.
+    /// </summary>
     public static void EnsurePackageLoaded()
     {
         if (Instance != null) return;
@@ -111,6 +125,9 @@ public sealed class NeopilotVSPackage : ToolkitPackage
         ThreadHelper.JoinableTaskFactory.Run(EnsurePackageLoadedAsync);
     }
 
+    /// <summary>
+    /// Ensures that the package is loaded asynchronously.
+    /// </summary>
     public static async Task EnsurePackageLoadedAsync()
     {
         if (Instance != null) return;
@@ -123,9 +140,12 @@ public sealed class NeopilotVSPackage : ToolkitPackage
         if (vsShell.IsPackageLoaded(ref guidPackage, out var _) == VSConstants.S_OK) return;
 
         if (vsShell.LoadPackage(ref guidPackage, out var _) != VSConstants.S_OK)
-            throw new NullReferenceException();
+            throw new NullReferenceException("Failed to load Neopilot package.");
     }
 
+    /// <summary>
+    /// Updates the visibility of the sign-in and sign-out commands, and shows a notification to the user if they are not signed in.
+    /// </summary>
     public async Task UpdateSignedInStateAsync()
     {
         await JoinableTaskFactory.SwitchToMainThreadAsync();
@@ -144,7 +164,6 @@ public sealed class NeopilotVSPackage : ToolkitPackage
             if (commandEnterToken != null) commandEnterToken.Visible = !IsSignedIn();
         }
 
-        // notify the user they need to sign in
         if (!IsSignedIn())
         {
             KeyValuePair<string, Action>[] actions = [
@@ -164,12 +183,17 @@ public sealed class NeopilotVSPackage : ToolkitPackage
                                   true,
                                   null,
                                   actions);
+        } else { 
+	        await NotificationAuth.CloseAsync();
         }
-        else { await NotificationAuth.CloseAsync(); }
 
         ChatToolWindow.Instance?.Reload();
     }
 
+    /// <summary>
+    /// Opens a URL in the default browser.
+    /// </summary>
+    /// <param name="url">The URL to open.</param>
     public static void OpenInBrowser(string url)
     {
         try
@@ -185,25 +209,54 @@ public sealed class NeopilotVSPackage : ToolkitPackage
         }
     }
 
+    /// <summary>
+    /// Gets the path to the AppData folder for the extension.
+    /// </summary>
     public string GetAppDataPath() => Utilities.PathProvider.GetAppDataPath();
 
+    /// <summary>
+    /// Gets the path to the language server folder.
+    /// </summary>
     public string GetLanguageServerFolder() => Utilities.PathProvider.GetLanguageServerFolder(LanguageServer.GetVersion());
 
+    /// <summary>
+    /// Gets the path to the language server executable.
+    /// </summary>
     public string GetLanguageServerPath() => Utilities.PathProvider.GetLanguageServerPath(LanguageServer.GetVersion(), SettingsPage.EnterpriseMode);
 
+    /// <summary>
+    /// Gets the path to the database directory.
+    /// </summary>
     public string GetDatabaseDirectory() => Utilities.PathProvider.GetDatabaseDirectory();
 
+    /// <summary>
+    /// Gets the path to the API key file.
+    /// </summary>
     public string GetAPIKeyPath() => Utilities.PathProvider.GetAPIKeyPath();
 
+    /// <summary>
+    /// Gets a value indicating whether the user is signed in.
+    /// </summary>
     public bool IsSignedIn() { return LanguageServer.GetKey().Length > 0; }
+
+    /// <summary>
+    /// Gets a value indicating whether the user has enterprise features enabled.
+    /// </summary>
     public bool HasEnterprise() { return SettingsPage.EnterpriseMode; }
 
+    /// <summary>
+    /// Logs a message to the output window. This is a fire-and-forget method.
+    /// </summary>
+    /// <param name="v">The message to log.</param>
     internal void Log(string v)
     {
-        ThreadHelper.JoinableTaskFactory.RunAsync(async delegate { await LogAsync(v); })
-            .FireAndForget(true);
+        LogAsync(v).FireAndForget(true);
     }
 
+    /// <summary>
+    /// Logs a message to the output window asynchronously.
+    /// </summary>
+    /// <param name="v">The message to log.</param>
     internal async Task LogAsync(string v)
     {
         await ThreadHelper.JoinableTaskFactory.SwitchToMainThreadAsync();
