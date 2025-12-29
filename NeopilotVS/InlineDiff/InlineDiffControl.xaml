@@ -3,13 +3,12 @@
              xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
              xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
              xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
-             xmlns:vsshell="clr-namespace:Microsoft.VisualStudio.Shell;assembly=Microsoft.VisualStudio.Shell.15.0"
-             xmlns:platform="clr-namespace:Microsoft.VisualStudio.PlatformUI;assembly=Microsoft.VisualStudio.Shell.15.0"
+             xmlns:vsshell="clr-namespace:Microsoft.VisualStudio.Shell;assembly=Microsoft.VisualStudio.Shell.17.0"
+             xmlns:platform="clr-namespace:Microsoft.VisualStudio.PlatformUI;assembly=Microsoft.VisualStudio.Shell.17.0"
              xmlns:toolkit="clr-namespace:Community.VisualStudio.Toolkit;assembly=Community.VisualStudio.Toolkit"
              xmlns:imaging="clr-namespace:Microsoft.VisualStudio.Imaging;assembly=Microsoft.VisualStudio.Imaging"
              xmlns:imagecatalog="clr-namespace:Microsoft.VisualStudio.Imaging;assembly=Microsoft.VisualStudio.ImageCatalog"
 
-             toolkit:Themes.UseVsTheme="True"
              mc:Ignorable="d"
              d:DesignWidth="800"
              d:DesignHeight="400"
@@ -26,7 +25,6 @@
             available by including the resource dictionary from the toolkit:
             -->
             <ResourceDictionary.MergedDictionaries>
-                <ResourceDictionary Source="{x:Static toolkit:ToolkitResourceKeys.ThemeResourcesUri}"/>
             </ResourceDictionary.MergedDictionaries>
 
             <!--
@@ -34,12 +32,8 @@
             styles. These can be referenced using the keys from `Microsoft.VisualStudio.Shell.VsResourceKeys`.
             -->
             <Style x:Key="AcceptButton" TargetType="Button" BasedOn="{StaticResource {x:Static vsshell:VsResourceKeys.ThemedDialogButtonStyleKey}}">
-                <Setter Property="platform:ImageThemingUtilities.ImageBackgroundColor"
-                        Value="{Binding Background, RelativeSource={RelativeSource Self}, Converter={StaticResource BrushToColorConverter}}"
-                        />
 
-                <Setter Property="Background" Value="{DynamicResource {x:Static platform:CommonControlsColors.ButtonDefaultBrushKey}}"/>
-                <Setter Property="Foreground" Value="{DynamicResource {x:Static platform:CommonControlsColors.ButtonDefaultTextBrushKey}}"/>
+                {DynamicResource {x:Static platform:EnvironmentColors.ButtonDefaultTextBrushKey}}
                 <Setter Property="Template">
                     <Setter.Value>
                         <ControlTemplate TargetType="{x:Type Button}">
@@ -58,9 +52,6 @@
             </Style>
 
             <Style x:Key="RejectButton" TargetType="Button" BasedOn="{StaticResource {x:Static vsshell:VsResourceKeys.ThemedDialogButtonStyleKey}}">
-                <Setter Property="platform:ImageThemingUtilities.ImageBackgroundColor"
-                        Value="{Binding Background, RelativeSource={RelativeSource Self}, Converter={StaticResource BrushToColorConverter}}"
-                        />
 
                 <Setter Property="Background" Value="{DynamicResource {x:Static platform:EnvironmentColors.VizSurfaceRedDarkBrushKey}}"/>
                 <Setter Property="Foreground" Value="{DynamicResource {x:Static platform:ThemedDialogColors.CloseWindowButtonHoverTextBrushKey}}"/>
