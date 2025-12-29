@@ -110,7 +110,7 @@
                                  VerticalContentAlignment="Center"
                                  KeyDown="InputPrompt_KeyDown" 
                                  TextChanged="InputPrompt_TextChanged"
-                                 vsshell:CaretBrushHelper.CaretBrush="{DynamicResource {x:Static vsshell:VsBrushes.WindowTextKey}}"/>
+                                 CaretBrush="{DynamicResource {x:Static vsshell:VsBrushes.WindowTextKey}}"/>
                         
                         <TextBlock x:Name="InputPromptHint" 
                                    IsHitTestVisible="False" 
