@@ -14,24 +14,29 @@ jobs:
      contents: 'read'
      id-token: 'write'
     runs-on: windows-latest
-    if: |
-      (github.event_name == 'push' && github.ref_type == 'branch') ||
-      (github.event_name == 'push' && github.ref_type == 'tag' && startsWith(github.ref, 'refs/tags/enterprise-release-v'))
     steps:
     - name: Checkout
-      uses: actions/checkout@v3
+      uses: actions/checkout@v4
       with:
         fetch-depth: 0
 
     # Add  MSBuild to the PATH: https://github.com/microsoft/setup-msbuild
     - name: Setup MSBuild
-      uses: microsoft/setup-msbuild@v1.0.2
+      uses: microsoft/setup-msbuild@v2
 
     - name: Setup NuGet
-      uses: NuGet/setup-nuget@v1.0.5
+      uses: NuGet/setup-nuget@v2
+
+    - name: Cache NuGet packages
+      uses: actions/cache@v4
+      with:
+        path: ~/.nuget/packages
+        key: ${{ runner.os }}-nuget-${{ hashFiles('**/packages.lock.json') }}
+        restore-keys: |
+          ${{ runner.os }}-nuget-
 
     - name: Restore Packages
-      run: nuget restore NeopilotVS.sln
+      run: dotnet restore NeopilotVS.sln
 
     - name: Set Release Condition
       id: check_release
@@ -53,7 +58,7 @@ jobs:
         $xml.Save($manifestPath)
 
     - name: Build Solution
-      run: msbuild NeopilotVS.sln /p:Configuration=Release /p:Platform="Any CPU" /p:TargetFrameworkVersion="v4.8" /restore
+      run: dotnet build NeopilotVS.sln --configuration Release --no-restore
 
     - id: auth
       if: env.IS_RELEASE == 'true'
