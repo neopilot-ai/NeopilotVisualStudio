@@ -8,18 +8,17 @@ using System.Linq;
 using System.Threading.Tasks;
 using System.Xml.Linq;
 using NeopilotVS;
-using NeopilotVS.LanguageServer;
 
 namespace NeopilotVS.Utilities;
 
 public class WorkspaceIndexer
 {
     private readonly NeopilotVSPackage _package;
-    private readonly LanguageServer.LanguageServer _server;
+    private readonly LanguageServer _server;
 
     public bool IsInitialized { get; private set; } = false;
 
-    public WorkspaceIndexer(NeopilotVSPackage package, LanguageServer.LanguageServer server)
+    public WorkspaceIndexer(NeopilotVSPackage package, LanguageServer server)
     {
         _package = package;
         _server = server;
