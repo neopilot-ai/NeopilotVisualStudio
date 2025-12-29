@@ -5,7 +5,7 @@ using System.Diagnostics;
 using Community.VisualStudio.Toolkit;
 using Microsoft.VisualStudio.Shell;
 using NeopilotVS.Utilities;
-using NeopilotVS.SuggestionUI; // Assuming NeopilotCompletionHandler is here or needs it
+using NeopilotVS.Languages; // SuggestionUI classes are in Languages namespace
 
 namespace NeopilotVS.Commands;
 

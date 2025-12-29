@@ -6,10 +6,8 @@ using Microsoft.VisualStudio.Text;
 using System;
 using System.Threading.Tasks;
 using System.Windows;
-using NeopilotVS.LanguageServer;
 using NeopilotVS.Packets;
 using NeopilotVS.Utilities;
-using NeopilotVS.Windows;
 
 namespace NeopilotVS.Commands;
 
