@@ -9,6 +9,7 @@
   </PropertyGroup>
   <PropertyGroup>
     <LangVersion>latest</LangVersion>
+    <Nullable>enable</Nullable>
     <TargetFramework>net8.0-windows</TargetFramework>
     <TargetFrameworkProfile />
     <NoWarn>NU1701</NoWarn>
