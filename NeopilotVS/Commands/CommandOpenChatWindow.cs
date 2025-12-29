@@ -2,7 +2,7 @@ using Community.VisualStudio.Toolkit;
 using Microsoft.VisualStudio.Shell;
 using System;
 using System.Threading.Tasks;
-using NeopilotVS.Windows;
+using NeopilotVS.Packets;
 
 namespace NeopilotVS.Commands;
 

@@ -7,7 +7,7 @@ using Community.VisualStudio.Toolkit;
 using Microsoft.VisualStudio.Shell;
 using NeopilotVS.Packets;
 using NeopilotVS.Utilities;
-using NeopilotVS.LanguageServer; // For LanguageServerController if needed
+ // For LanguageServerController if needed
 
 namespace NeopilotVS.Commands;
 

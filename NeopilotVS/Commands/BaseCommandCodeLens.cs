@@ -9,7 +9,6 @@ using Community.VisualStudio.Toolkit;
 using Microsoft.VisualStudio.Shell;
 using NeopilotVS.Packets;
 using NeopilotVS.Utilities;
-using NeopilotVS.LanguageServer;
 
 namespace NeopilotVS.Commands;
 

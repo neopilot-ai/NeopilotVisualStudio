@@ -1,7 +1,7 @@
 ﻿global using Community.VisualStudio.Toolkit;
 global using Microsoft.VisualStudio.Shell;
 global using System;
-global using Task = System.Threading.Tasks.Task;
+global using System.Threading.Tasks;
 using Microsoft.VisualStudio;
 using Microsoft.VisualStudio.Imaging;
 using Microsoft.VisualStudio.Shell.Interop;

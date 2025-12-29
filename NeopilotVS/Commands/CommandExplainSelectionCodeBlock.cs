@@ -4,7 +4,6 @@ using Microsoft.VisualStudio.Shell;
 using Microsoft.VisualStudio.Text;
 using System;
 using System.Threading.Tasks;
-using NeopilotVS.LanguageServer;
 using NeopilotVS.Packets;
 
 namespace NeopilotVS.Commands;
