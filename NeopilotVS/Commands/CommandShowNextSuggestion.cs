@@ -15,7 +15,7 @@ internal sealed class CommandShowNextSuggestion
         {
             if (completionHandler == null) return;
 
-            completionHandler.ShowNextSuggestion();
+            await completionHandler.ShowNextSuggestionAsync();
         }
         catch (Exception ex)
         {
